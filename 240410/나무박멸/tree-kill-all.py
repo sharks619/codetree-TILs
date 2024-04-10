@@ -37,9 +37,10 @@ def breed():
                         if maps[ny][nx] == 0:
                             breed_lst.append((ny,nx))
                             cnt += 1
-                breed_num = maps[y][x]//cnt
-                for by,bx in breed_lst:
-                    new_map[by][bx] += breed_num
+                if cnt:            
+                    breed_num = maps[y][x]//cnt
+                    for by,bx in breed_lst:
+                        new_map[by][bx] += breed_num
 
     for y in range(n):
         for x in range(n):
