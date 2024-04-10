@@ -62,7 +62,10 @@ def move():
 def round(k):
 
     a,b = divmod(k,4*n)
-    b-=1
+    if b == 0:
+        b = 4*n-1
+    else:
+        b -= 1
     if 0 <= b < n:
         for i in range(n):
             if team[b][i]:
@@ -101,7 +104,6 @@ def info_update(r,c):
             idx2 = j
             break
     answer += (idx2+1)**2
-
     team_q[idx].reverse()
 
     # 1,3 변경
@@ -139,6 +141,7 @@ for i in range(k):
     # print("new_team")
     # for nt in team:
     #     print(nt)
+    # print("k:",i+1)
     round(i+1)
     # print("new_team2")
     # for nt in team:
