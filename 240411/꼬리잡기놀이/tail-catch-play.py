@@ -60,45 +60,48 @@ def move():
     team = new_team
 
 def round(k):
-    global answer
 
     a,b = divmod(k,4*n)
     b-=1
     if 0 <= b < n:
         for i in range(n):
             if team[b][i]:
-                answer += team[b][i]**2
-                team_info_change(b,i)
+                info_update(b,i)
                 break
     elif n <= b < 2*n:
         b = b-n
         for j in range(n-1,-1,-1):
             if team[j][b]:
-                answer += team[j][b] ** 2
-                team_info_change(j,b)
+                info_update(j,b)
                 break
     elif 2*n <= b < 3*n:
         b = 3*n-b-1
         for i in range(n-1,-1,-1):
             if team[b][i]:
-                answer += team[b][i] ** 2
-                team_info_change(b,i)
+                info_update(b,i)
                 break
     elif 3*n <= b < 4*n:
         b = 4*n-b-1
         for j in range(n):
             if team[j][b]:
-                answer += team[j][b] ** 2
-                team_info_change(j,b)
+                info_update(j,b)
                 break
 
-def team_info_change(r,c):
-    global team
+def info_update(r,c):
+    global team, answer
+
     idx = 0
+    idx2 = 0
     for i in range(len(team_q)):
         if (r,c) in team_q[i]:
             idx = i
             break
+    for j in range(len(team_q[idx])):
+        if (r,c) == team_q[idx][j]:
+            idx2 = j
+            break
+    answer += (idx2+1)**2
+
     team_q[idx].reverse()
 
     # 1,3 변경
