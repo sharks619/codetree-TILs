@@ -83,12 +83,11 @@ def follow2(): # 술래 움직임2
 
     follow_list.pop()
     follow_list.extend(q)
-
 def catch(): # 도망자 잡기
     global answer
     # print("fy,fx,fd,fc:",fy,fx,fd,fc)
     if fd==0: # 상
-        for r in range(fy,min(-1,fy-3),-1):
+        for r in range(fy,max(-1,fy-3),-1):
             if maps[r][fx]:
                 if not tree[r][fx]:
                     answer += fc*sum([v for v in maps[r][fx].values()])
@@ -106,7 +105,7 @@ def catch(): # 도망자 잡기
                     answer += fc*sum([v for v in maps[r][fx].values()])
                     maps[r][fx] = {}
     elif fd==3: # 좌
-        for c in range(fx,min(-1,fx-3),-1):
+        for c in range(fx,max(-1,fx-3),-1):
             if maps[fy][c]:
                 if not tree[fy][c]:
                     answer += fc*sum([v for v in maps[fy][c].values()])
@@ -136,6 +135,7 @@ answer = 0
 follow_list = []
 follow(fy,fx,fd)
 follow2()
+
 fy = fx = (n-1)//2 # 현 위치
 
 for i in range(k):
