@@ -25,7 +25,7 @@ def escape(): # 도망가기
             ny, nx = ey+d[0], ex+d[1]
             if 0<=ny<n and 0<=nx<n:
                 if (ny,nx) == (fy,fx):
-                    if di in new_map[ny][nx].keys():
+                    if di in new_map[ey][ex].keys():
                         new_map[ey][ex][di] += num
                     else:
                         new_map[ey][ex][di] = num
@@ -99,8 +99,10 @@ def follow2(): # 술래 움직임2
 
     follow_list.pop()
     follow_list.extend(q)
+    
 def catch(): # 도망자 잡기
     global answer
+    # print("fy,fx,fd,fc:",fy,fx,fd,fc)
     if fd==0: # 상
         for r in range(fy,max(-1,fy-3),-1):
             if maps[r][fx]:
@@ -155,8 +157,21 @@ fy = fx = (n-1)//2 # 현 위치
 
 for i in range(k):
     escape_list,remain_list = d_check()
+    # print("시작")
+    # for ma in maps:
+    #     print(ma)
+    # print()
     escape()
+    # print("escape")
+    # for ma in maps:
+    #     print(ma)
+    # print()
     fy, fx, fd = follow_list[i % len(follow_list)]
     catch()
+    # print("catch")
+    # for ma in maps:
+    #     print(ma)
+    # print()
     fc += 1
+    # print("ans:",answer)
 print(answer)
