@@ -51,7 +51,7 @@ def follow2():
     re_follow_list = list(reversed(follow_list))
     follow_list.pop()
     for f_r,f_c,f_d in re_follow_list:
-        follow_list.append([f_r,f_c,(d+1)%4])
+        follow_list.append([f_r,f_c,(f_d+1)%4])
     follow_list.append([0,0,0])
 
 def catch(): # 도망자 잡기
