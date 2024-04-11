@@ -3,17 +3,23 @@ f_dirs = [(-1,0),(0,1),(1,0),(0,-1)]
 
 def d_check(): # 거리 3 이하 도망자 찾기
     escape_lst = []
+    remain_lst = []
     for r in range(n):
         for c in range(n):
             if maps[r][c]:
                 if (abs(r-fy)+abs(c-fx)) <= 3:
                     for k,v in maps[r][c].items():
                         escape_lst.append([r,c,k,v])
-    return escape_lst
+                else:
+                    for k,v in maps[r][c].items():
+                        remain_lst.append([r,c,k,v])
+    return escape_lst,remain_lst
 
 def escape(): # 도망가기
+    global maps
+
+    new_map = [[{} for _ in range(n)] for _ in range(n)]
     for ey,ex,di,num in escape_list:
-        orig_di = di
         while True:
             d = dirs[di]
             ny, nx = ey+d[0], ex+d[1]
@@ -21,11 +27,10 @@ def escape(): # 도망가기
                 if (ny,nx) == (fy,fx):
                     break
                 else:
-                    if di in maps[ny][nx].keys():
-                        maps[ny][nx][di] += num
+                    if di in new_map[ny][nx].keys():
+                        new_map[ny][nx][di] += num
                     else:
-                        maps[ny][nx][di] = num
-                    del maps[ey][ex][orig_di]
+                        new_map[ny][nx][di] = num
                     break
             else:
                 if di==0:
@@ -36,6 +41,13 @@ def escape(): # 도망가기
                     di=0
                 elif di==3:
                     di=2
+    for ry,rx,rd,rn in remain_list:
+        if rd in new_map[ry][rx].keys():
+            new_map[ry][rx][rd] += rn
+        else:
+            new_map[ry][rx][rd] = rn
+
+    maps = new_map
 
 def follow(fy,fx,fd): # 술래 움직임
     t=0
@@ -139,7 +151,7 @@ follow2()
 fy = fx = (n-1)//2 # 현 위치
 
 for i in range(k):
-    escape_list = d_check()
+    escape_list,remain_list = d_check()
     escape()
     fy, fx, fd = follow_list[i % len(follow_list)]
     catch()
