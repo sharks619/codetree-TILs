@@ -173,5 +173,5 @@ for _ in range(q):
         remove(info)
     elif type == 400:
         check(info)
-    elif type == 500:
+    else:
         broken(info)
