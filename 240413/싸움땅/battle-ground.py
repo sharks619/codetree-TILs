@@ -47,36 +47,32 @@ for _ in range(k):
 
                 # 패배자 이동
                 lidx,ly,lx,ld,ls,lg = l
-                # flag = False
-                # while 1:
-                #     lny,lnx = ly+dirs[ld][0],lx+dirs[ld][1]
-                #     if 0<=lny<n and 0<=lnx<n:
-                #         for p in p_list:
-                #             if p in (i,j):
-                #                 continue
-                #             if (lny,lnx) in p_dict[p]:
-                #                 ld = (ld+1)%4
-                #             else:
-                #                 flag = True
-                #             break
-                #     else:
-                #         ld = (ld+1)%4
-                #     if flag:
-                #         break
 
                 for _ in range(4):
                     lny,lnx = ly+dirs[ld][0],lx+dirs[ld][1]
-                    if 0 > lny or lny >= n or 0 > lnx or lnx >= n:
+                    if 0<=lny<n and 0<=lnx<n:
+                        for p in p_list:
+                            if p in (i,j):
+                                continue
+                            if (lny,lnx) in p_dict[p]:
+                                ld = (ld+1)%4
+                    else:
                         ld = (ld+1)%4
-                        lny,lnx = ly+dirs[ld][0], lx+dirs[ld][1]
-                        continue
-                    for p in p_list:
-                        if p in (i,j):
-                            continue
-                        if (lny,lnx) in p_dict[p]:
-                            ld = (ld+1)%4
-                            lny,lnx = ly+dirs[ld][0],lx+dirs[ld][1]
-                            break
+
+                # for _ in range(4):
+                #     lny,lnx = ly+dirs[ld][0],lx+dirs[ld][1]
+                #     print(lny, lnx)
+                #     if 0 > lny or lny >= n or 0 > lnx or lnx >= n:
+                #         ld = (ld+1)%4
+                #         lny,lnx = ly+dirs[ld][0], lx+dirs[ld][1]
+                #         continue
+                #     for p in p_list:
+                #         if p in (i,j):
+                #             continue
+                #         if (lny,lnx) in p_dict[p]:
+                #             ld = (ld+1)%4
+                #             lny,lnx = ly+dirs[ld][0],lx+dirs[ld][1]
+                #             break
 
                 best_lg = max(maps[lny][lnx])
                 maps[lny][lnx].remove(best_lg)
