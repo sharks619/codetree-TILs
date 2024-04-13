@@ -2,7 +2,7 @@ from collections import defaultdict
 
 max_m = 10
 weight = {} # id별 상자 무게 저장
-n,m = 0,0
+n,m,q = 0,0,0
 
 prv = defaultdict(lambda: 0)
 nxt = defaultdict(lambda: 0)
@@ -69,12 +69,8 @@ def remove_id(id,removebelt):
 def push_id(tgt_id, id):
     nxt[tgt_id]=id
     prv[id]=tgt_id
-    # 이런식으로 처리해야되는게 아닌가..?
-    # o_nid = nxt[tgt_id]
-    # nxt[tgt_id]=id
-    # nxt[id]=o_nid
-    b_num = belt_num[tgt_id]
 
+    b_num = belt_num[tgt_id]
     if tail[b_num]==tgt_id:
         tail[b_num] = id
 
@@ -144,7 +140,7 @@ def broken(info):
         return
 
     nxt_num = b_num
-    while 1:
+    while True:
         nxt_num = (nxt_num+1)%m
 
         if not broken_belt[nxt_num]:
