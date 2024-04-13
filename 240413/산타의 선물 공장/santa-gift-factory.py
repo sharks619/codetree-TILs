@@ -2,7 +2,7 @@ from collections import defaultdict
 
 max_m = 10
 weight = {} # id별 상자 무게 저장
-n,m,q = 0,0,0
+n,m,q = -1,-1,-1
 
 prv = defaultdict(lambda: 0)
 nxt = defaultdict(lambda: 0)
