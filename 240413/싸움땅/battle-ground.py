@@ -1,84 +1,109 @@
-dir = [(-1,0),(0,1),(1,0),(0,-1)]
+dirs = [(-1,0),(0,1),(1,0),(0,-1)] # ↑, →, ↓, ←
 
-N, M, K = map(int, input().split())
-graph = [list(map(int, input().split())) for _ in range(N)]
-for i in range(N):
-    for j in range(N):
-        graph[i][j] = [graph[i][j]]
-playerlist = []
-playerdict = {}
-scorelist = [0]*M
-for t in range(M):
-    x, y, d, s = map(int, input().split())
-    playerlist.append(t)
-    playerdict[t] = [(x-1,y-1),d,s,0]  # 좌표, 방향, 공격력, 총
+n,m,k = map(int, input().split())
+maps = [list(map(int, input().split())) for _ in range(n)]
+for r in range(n):
+    for c in range(n):
+        maps[r][c] = [maps[r][c]]
 
-for _ in range(K):
-    # ======= 여기부터 한 턴 시작 =======
-    for i in playerlist:
+p_list = []
+p_dict = {}
+score = [0]*m
 
-        # 1-1. 첫번째 플레이어부터 이동
-        (x,y),d,s,g = playerdict[i]  # 현재 움직이는 녀석의 좌표, 방향, 공격력, 총
-        nx, ny = x+dir[d][0], y+dir[d][1]
-        if 0>nx or N-1<nx or 0>ny or N-1<ny:
-            d = (d+2)%4
-            nx, ny = x+dir[d][0], y+dir[d][1]
+for i in range(m):
+    x,y,d,s = map(int, input().split())
+    p_list.append(i)
+    p_dict[i] = [(x-1,y-1),d,s,0] # 위치,방향,능력치,총
 
-        movelist = []
-        for j in playerlist:
-            if (nx,ny) in playerdict[j]:  # 2-2-1. 플레이어가 있다면
-                (ex,ey),ed,es,eg = playerdict[j]  # enemy의 줄임말임 ㅋㅋ
-
-                if s+g>es+eg or (s+g==es+eg and s>g):  # 현재 플레이어가 이긴다면
-                    winner = (i, nx, ny, d, s, g)
-                    loser = (j, ex, ey, ed, es, 0)
-                    graph[nx][ny].append(eg)
-                else:
-                    winner = (j, ex, ey, ed, es, eg)
-                    loser = (i, nx, ny, d, s, 0)
-                    graph[nx][ny].append(g)
-                scorelist[winner[0]] += abs(s+g-es-eg)
-
-                # 2-2-2. 진 플레이어의 이동
-                l, lx, ly, ld, ls, lg = loser
-                for kk in range(4):
-                    lnx, lny = lx+dir[ld][0], ly+dir[ld][1]
-                    if 0>lnx or N-1<lnx or 0>lny or N-1<lny:
-                        ld = (ld+1)%4
-                        lnx, lny = lx+dir[ld][0], ly+dir[ld][1]
-                        continue
-                    for k in playerlist:
-                        if k in (i,j): continue
-                        if (lnx,lny) in playerdict[k]:
-                            ld = (ld+1)%4
-                            lnx, lny = lx+dir[ld][0], ly+dir[ld][1]
-                            break
-                maxx = max(graph[lnx][lny])
-                graph[lnx][lny].remove(maxx)
-                lg, maxx = maxx, lg
-                graph[lnx][lny].append(maxx)
-                movelist.append((l,lnx,lny,ld,ls,lg))
-
-                # 2-2-3. 이긴 플레이어의 이동
-                w, wx, wy, wd, ws, wg = winner
-                maxx = max(graph[wx][wy])
-                graph[wx][wy].remove(maxx)
-                if wg<maxx:
-                    wg, maxx = maxx, wg
-                graph[wx][wy].append(maxx)
-                movelist.append((w,wx,wy,wd,ws,wg))
+for _ in range(k):
+    for i in p_list:
+        (y,x),d,s,g = p_dict[i]
+        while 1:
+            ny,nx = y+dirs[d][0], x+dirs[d][1]
+            if 0<=ny<n and 0<=nx<n:
                 break
+            else:
+                d = (d+2)%4
 
-        else:  # 2-1. 플레이어 중에 겹치는 녀석이 없다면
-            maxx = max(graph[nx][ny])
-            graph[nx][ny].remove(maxx)
-            if g<maxx:  # 내 총이 바닥의 큰 것보다 작다면
-                g, maxx = maxx, g
-            graph[nx][ny].append(maxx)
-            playerdict[i] = [(nx,ny),d,s,g]
+        # ny,nx = y+dirs[d][0], x+dirs[d][1]
+        # if 0 > ny or ny >= n or 0 > nx or nx >= n:
+        #     d = (d+2)%4
+        #     ny,nx = y+dirs[d][0],x+dirs[d][1]
 
-        if movelist:
-            playerdict[movelist[0][0]] = [(movelist[0][1],movelist[0][2]),movelist[0][3],movelist[0][4],movelist[0][5]]
-            playerdict[movelist[1][0]] = [(movelist[1][1],movelist[1][2]),movelist[1][3],movelist[1][4],movelist[1][5]]
+        move_list = []
+        for j in p_list:
+            if (ny,nx) in p_dict[j]:
+                (ey,ex),ed,es,eg = p_dict[j]
 
-print(*scorelist)
+                if s+g>es+eg or (s+g==es+eg and s>es):
+                    w = (i,ny,nx,d,s,g)
+                    l = (j,ey,ex,ed,es,0)
+                    maps[ey][ex].append(eg)
+                else:
+                    w = (j,ey,ex,ed,es,eg)
+                    l = (i,ny,nx,d,s,0)
+                    maps[ny][nx].append(g)
+                score[w[0]] += abs(s+g-es-eg)
+
+                # 패배자 이동
+                lidx,ly,lx,ld,ls,lg = l
+                flag = False
+                while 1:
+                    lny,lnx = ly+dirs[ld][0],lx+dirs[ld][1]
+                    if 0<=lny<n and 0<=lnx<n:
+                        for p in p_list:
+                            if p in (i,j):
+                                continue
+                            if (lny,lnx) in p_dict[p]:
+                                ld = (ld+1)%4
+                            else:
+                                flag = True
+                            break
+                    else:
+                        ld = (ld+1)%4
+                    if flag:
+                        break
+
+                # for _ in range(4):
+                #     lny,lnx = ly+dirs[ld][0],lx+dirs[ld][1]
+                #     if 0 > lny or lny >= n or 0 > lnx or lnx >= n:
+                #         ld = (ld+1)%4
+                #         lny,lnx = ly+dirs[ld][0], lx+dirs[ld][1]
+                #         continue
+                #     for p in p_list:
+                #         if p in (i,j):
+                #             continue
+                #         if (lny,lnx) in p_dict[p]:
+                #             ld = (ld+1)%4
+                #             lny,lnx = ly+dirs[ld][0],lx+dirs[ld][1]
+                #             break
+
+                best_lg = max(maps[lny][lnx])
+                maps[lny][lnx].remove(best_lg)
+                maps[lny][lnx].append(lg)
+                move_list.append((lidx,lny,lnx,ld,ls,best_lg))
+
+                # 승리자 이동
+                widx,wy,wx,wd,ws,wg = w
+                best_wg = max(maps[wy][wx])
+                if wg < best_wg:
+                    maps[wy][wx].remove(best_wg)
+                    maps[wy][wx].append(wg)
+                    move_list.append((widx,wy,wx,wd,ws,best_wg))
+                else:
+                    move_list.append((widx,wy,wx,wd,ws,wg))
+                break
+        else:
+            best_g = max(maps[ny][nx])
+            if g < best_g:
+                maps[ny][nx].remove(best_g)
+                maps[ny][nx].append(g)
+                p_dict[i] = [(ny,nx),d,s,best_g]
+            else:
+                p_dict[i] = [(ny,nx),d,s,g]
+
+        if move_list:
+            p_dict[move_list[0][0]] = [(move_list[0][1],move_list[0][2]),move_list[0][3],move_list[0][4],move_list[0][5]]
+            p_dict[move_list[1][0]] = [(move_list[1][1],move_list[1][2]),move_list[1][3],move_list[1][4],move_list[1][5]]
+
+print(*score)
