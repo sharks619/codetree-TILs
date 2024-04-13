@@ -4,8 +4,8 @@ max_m = 10
 weight = {} # id별 상자 무게 저장
 n,m = 0,0
 
-prv = defaultdict(int)
-nxt = defaultdict(int)
+prv = defaultdict(lambda: 0)
+nxt = defaultdict(lambda: 0)
 
 head = [0]*max_m
 tail = [0]*max_m
