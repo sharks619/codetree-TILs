@@ -58,8 +58,7 @@ def bfs(i, r, c, maps):
         sub.append([total_cnt, i, r, c, remove_list])
 
 def refill(mlst):
-    for i in range(len(mlst)):
-        r, c = mlst[i]
+    for r,c in mlst:
         new_map[r][c] = 0
 
     for x in range(5):
@@ -111,8 +110,6 @@ for _ in range(k):
         break
     else:
         m_cnt, mi, mr, mc, mlst = sorted(sub, key=lambda x: -x[0])[0]
-        mlst.sort(key=lambda x: -x[0])
-
         new_map = [row[:] for row in maps]
 
         sub_map = [row[mc-1:mc+2] for row in new_map[mr-1:mr+2]]
