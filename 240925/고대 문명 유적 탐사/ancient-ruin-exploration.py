@@ -69,7 +69,7 @@ def refill(mlst):
 
 
 def remove():
-    global answer
+    global ans
 
     while True:
         remove_list = []
@@ -93,15 +93,16 @@ def remove():
                 if cnt >= 3:
                     remove_list.extend(r_lst)
         if remove_list:
-            answer += len(remove_list)
+            ans += len(remove_list)
             refill(remove_list)
         else:
             break
 
-answer = 0
+answer = []
 for _ in range(k):
     max_cnt = 0
     sub = []
+    ans = 0
     for i in range(3):
         for c in range(1,4):
             for r in range(1,4):
@@ -120,13 +121,12 @@ for _ in range(k):
         for idx in range(3):
             new_map[mr-1+idx][mc-1:mc+2] = r_result[idx]
 
-        if m_cnt == 0:
-            break
-
-        answer += m_cnt
+        ans += m_cnt
         refill(mlst)
 
         remove()
         maps = new_map
+    if ans:
+        answer.append(ans)
 
-print(answer)
+print(*answer)
