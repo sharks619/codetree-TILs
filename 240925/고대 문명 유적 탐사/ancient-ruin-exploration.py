@@ -53,7 +53,7 @@ def bfs(i, r, c, maps):
                 total_cnt += cnt
                 remove_list.extend(r_lst)
 
-    if total_cnt >= max_cnt:
+    if total_cnt > max_cnt:
         max_cnt = total_cnt
         sub.append([total_cnt, i, r, c, remove_list])
 
@@ -106,23 +106,25 @@ for _ in range(k):
         for c in range(1,4):
             for r in range(1,4):
                 bfs(i, r, c, maps)
+
     if not sub:
         break
-    else:
-        m_cnt, mi, mr, mc, mlst = sorted(sub, key=lambda x: -x[0])[0]
-        new_map = [row[:] for row in maps]
 
-        sub_map = [row[mc-1:mc+2] for row in new_map[mr-1:mr+2]]
-        r_result = r_dic[mi](sub_map)
+    m_cnt, mi, mr, mc, mlst = sorted(sub, key=lambda x: -x[0])[0]
+    new_map = [row[:] for row in maps]
 
-        for idx in range(3):
-            new_map[mr-1+idx][mc-1:mc+2] = r_result[idx]
+    sub_map = [row[mc-1:mc+2] for row in new_map[mr-1:mr+2]]
+    r_result = r_dic[mi](sub_map)
 
-        ans += m_cnt
-        refill(mlst)
+    for idx in range(3):
+        new_map[mr-1+idx][mc-1:mc+2] = r_result[idx]
 
-        remove()
-        maps = new_map
+    ans += m_cnt
+    refill(mlst)
+
+    remove()
+    maps = new_map
+
     if ans:
         answer.append(ans)
 
