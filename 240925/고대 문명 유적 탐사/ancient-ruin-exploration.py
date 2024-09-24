@@ -6,6 +6,7 @@ k, m = map(int, input().split())
 maps = [list(map(int, input().split())) for _ in range(5)]
 nums = deque(list(map(int, input().split())))
 
+
 def r_90(arr):
     return [list(a[::-1]) for a in zip(*arr)]
 
@@ -18,16 +19,14 @@ def r_270(arr):
 r_dic = {0: r_90, 1: r_180, 2: r_270}
 
 def bfs(i, r, c, maps):
-
     global max_cnt
 
     new_map = [row[:] for row in maps]
-
-    sub_map = [row[c-1:c+2] for row in new_map[r-1:r+2]]
+    sub_map = [row[c - 1:c + 2] for row in new_map[r - 1:r + 2]]
     r_result = r_dic[i](sub_map)
 
     for idx in range(3):
-        new_map[r-1+idx][c-1:c+2] = r_result[idx]
+        new_map[r - 1 + idx][c - 1:c + 2] = r_result[idx]
 
     remove_list = []
     v = [[0] * 5 for _ in range(5)]
@@ -55,17 +54,16 @@ def bfs(i, r, c, maps):
 
     if total_cnt > max_cnt:
         max_cnt = total_cnt
-        sub.append([total_cnt, i, r, c, remove_list])
+        sub.append([total_cnt, i, r, c, remove_list, new_map])
 
 def refill(mlst):
-    for r,c in mlst:
+    for r, c in mlst:
         new_map[r][c] = 0
 
     for x in range(5):
-        for y in range(4,-1,-1):
-            if new_map[y][x]==0:
+        for y in range(4, -1, -1):
+            if new_map[y][x] == 0:
                 new_map[y][x] = nums.popleft()
-
 
 def remove():
     global ans
@@ -97,27 +95,22 @@ def remove():
         else:
             break
 
+
 answer = []
 for _ in range(k):
     max_cnt = 0
     sub = []
     ans = 0
     for i in range(3):
-        for c in range(1,4):
-            for r in range(1,4):
+        for c in range(1, 4):
+            for r in range(1, 4):
                 bfs(i, r, c, maps)
 
     if not sub:
         break
 
-    m_cnt, mi, mr, mc, mlst = sorted(sub, key=lambda x: -x[0])[0]
-    new_map = [row[:] for row in maps]
-
-    sub_map = [row[mc-1:mc+2] for row in new_map[mr-1:mr+2]]
-    r_result = r_dic[mi](sub_map)
-
-    for idx in range(3):
-        new_map[mr-1+idx][mc-1:mc+2] = r_result[idx]
+    m_cnt, mi, mr, mc, mlst, mmap = sorted(sub, key=lambda x: -x[0])[0]
+    new_map = mmap
 
     ans += m_cnt
     refill(mlst)
