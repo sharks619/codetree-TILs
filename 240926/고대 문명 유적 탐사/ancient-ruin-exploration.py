@@ -56,7 +56,7 @@ def bfs(i, r, c, c_map):
 
     if total_cnt > max_cnt:
         max_cnt = total_cnt
-        sub.append([total_cnt, i, c, r, remove_list, new_map])
+        sub.append([total_cnt, i, r, c, remove_list, new_map])
     
 
 def refill(mlst, n_map):
@@ -115,7 +115,7 @@ for _ in range(k):
     if not sub:
         break
 
-    m_cnt, mi, mc, mr, mlst, mmap = sorted(sub, key=lambda x: -x[0])[0]
+    m_cnt, mi, mr, mc, mlst, mmap = sorted(sub, key=lambda x: -x[0])[0]
     n_map = mmap
 
     ans += m_cnt
