@@ -73,8 +73,8 @@ def remove():
     while True:
         remove_list = []
         v = [[0] * 5 for _ in range(5)]
-        for c in range(5):
-            for r in range(5):
+        for r in range(5):
+            for c in range(5):
                 q = deque([(r, c)])
                 r_lst = [(r, c)]
                 v[r][c] = 1
