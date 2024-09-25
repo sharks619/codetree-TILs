@@ -75,6 +75,8 @@ def remove():
         v = [[0] * 5 for _ in range(5)]
         for r in range(5):
             for c in range(5):
+                if v[r][c]:
+                    continue
                 q = deque([(r, c)])
                 r_lst = [(r, c)]
                 v[r][c] = 1
