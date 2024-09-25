@@ -18,10 +18,10 @@ def r_270(arr):
 
 r_dic = {0: r_90, 1: r_180, 2: r_270}
 
-def bfs(i, r, c, maps):
+def bfs(i, r, c, c_map):
     global max_cnt
 
-    new_map = [row[:] for row in maps]
+    new_map = [row[:] for row in c_map]
     sub_map = [row[c - 1:c + 2] for row in new_map[r - 1:r + 2]]
     r_result = r_dic[i](sub_map)
 
