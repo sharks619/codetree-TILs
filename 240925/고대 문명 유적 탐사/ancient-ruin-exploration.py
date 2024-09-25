@@ -98,8 +98,7 @@ def remove(n2_map):
         if remove_list:
             ans += len(remove_list)
             n2_map = refill(remove_list, n2_map)
-        else:
-            break
+
     return n2_map
 
 answer = []
