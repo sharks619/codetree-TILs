@@ -40,11 +40,11 @@ def bfs(i, r, c, c_map):
             v[cr][cc] = 1
             cnt = 1
             while q:
-                cr, cc = q.popleft()
+                c_r, c_c = q.popleft()
                 for d in dirs:
-                    nr, nc = cr + d[0], cc + d[1]
+                    nr, nc = c_r + d[0], c_c + d[1]
                     if 0 <= nr < 5 and 0 <= nc < 5 and not v[nr][nc]:
-                        if new_map[nr][nc] == new_map[cr][cc]:
+                        if new_map[nr][nc] == new_map[c_r][c_c]:
                             q.append((nr, nc))
                             r_lst.append((nr, nc))
                             v[nr][nc] = 1
