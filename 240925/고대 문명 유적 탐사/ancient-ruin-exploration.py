@@ -57,20 +57,20 @@ def bfs(i, r, c, c_map):
     if total_cnt > max_cnt:
         max_cnt = total_cnt
         sub.append([total_cnt, i, r, c, remove_list, new_map])
+    
 
-def refill(mlst):
-    global new_map
-
+def refill(mlst, n_map):
     for r, c in mlst:
-        new_map[r][c] = 0
+        n_map[r][c] = 0
 
     for x in range(5):
         for y in range(4, -1, -1):
-            if new_map[y][x] == 0:
-                new_map[y][x] = nums.popleft()
+            if n_map[y][x] == 0:
+                n_map[y][x] = nums.popleft()
+    return n_map
 
-def remove():
-    global ans, new_map
+def remove(n2_map):
+    global ans
 
     while True:
         remove_list = []
@@ -88,7 +88,7 @@ def remove():
                     for d in dirs:
                         nr, nc = cr + d[0], cc + d[1]
                         if 0 <= nr < 5 and 0 <= nc < 5 and not v[nr][nc]:
-                            if new_map[nr][nc] == new_map[cr][cc]:
+                            if n2_map[nr][nc] == n2_map[cr][cc]:
                                 q.append((nr, nc))
                                 r_lst.append((nr, nc))
                                 v[nr][nc] = 1
@@ -97,10 +97,10 @@ def remove():
                     remove_list.extend(r_lst)
         if remove_list:
             ans += len(remove_list)
-            refill(remove_list)
+            n2_map = refill(remove_list, n2_map)
         else:
             break
-
+    return n2_map
 
 answer = []
 for _ in range(k):
@@ -116,13 +116,13 @@ for _ in range(k):
         break
 
     m_cnt, mi, mr, mc, mlst, mmap = sorted(sub, key=lambda x: -x[0])[0]
-    new_map = mmap
+    n_map = mmap
 
     ans += m_cnt
-    refill(mlst)
+    n2_map = refill(mlst, n_map)
 
-    remove()
-    maps = new_map
+    n3_map = remove(n2_map)
+    maps = n3_map
 
     if ans:
         answer.append(ans)
