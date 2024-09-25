@@ -59,6 +59,8 @@ def bfs(i, r, c, c_map):
         sub.append([total_cnt, i, r, c, remove_list, new_map])
 
 def refill(mlst):
+    global new_map
+
     for r, c in mlst:
         new_map[r][c] = 0
 
@@ -68,7 +70,7 @@ def refill(mlst):
                 new_map[y][x] = nums.popleft()
 
 def remove():
-    global ans
+    global ans, new_map
 
     while True:
         remove_list = []
