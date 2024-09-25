@@ -31,8 +31,8 @@ def bfs(i, r, c, maps):
     remove_list = []
     v = [[0] * 5 for _ in range(5)]
     total_cnt = 0
-    for cc in range(5):
-        for cr in range(5):
+    for cr in range(5):
+        for cc in range(5):
             if v[cr][cc]:
                 continue
             q = deque([(cr, cc)])
