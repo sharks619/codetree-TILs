@@ -18,6 +18,7 @@ def r_270(arr):
 
 r_dic = {0: r_90, 1: r_180, 2: r_270}
 
+
 def bfs(i, r, c, c_map):
     global max_cnt
 
@@ -31,20 +32,20 @@ def bfs(i, r, c, c_map):
     remove_list = []
     v = [[0] * 5 for _ in range(5)]
     total_cnt = 0
-    for cr in range(5):
-        for cc in range(5):
-            if v[cr][cc]:
+    for r in range(5):
+        for c in range(5):
+            if v[r][c]:
                 continue
-            q = deque([(cr, cc)])
-            r_lst = [(cr, cc)]
-            v[cr][cc] = 1
+            q = deque([(r, c)])
+            r_lst = [(r, c)]
+            v[r][c] = 1
             cnt = 1
             while q:
-                c_r, c_c = q.popleft()
+                cr, cc = q.popleft()
                 for d in dirs:
-                    nr, nc = c_r + d[0], c_c + d[1]
+                    nr, nc = cr + d[0], cc + d[1]
                     if 0 <= nr < 5 and 0 <= nc < 5 and not v[nr][nc]:
-                        if new_map[nr][nc] == new_map[c_r][c_c]:
+                        if new_map[nr][nc] == new_map[cr][cc]:
                             q.append((nr, nc))
                             r_lst.append((nr, nc))
                             v[nr][nc] = 1
@@ -57,7 +58,7 @@ def bfs(i, r, c, c_map):
     if total_cnt > max_cnt:
         max_cnt = total_cnt
         sub.append([total_cnt, i, r, c, remove_list, new_map])
-    
+
 
 def refill(mlst, n_map):
     for r, c in mlst:
@@ -68,6 +69,7 @@ def refill(mlst, n_map):
             if n_map[y][x] == 0:
                 n_map[y][x] = nums.popleft()
     return n_map
+
 
 def remove(n2_map):
     global ans
@@ -101,6 +103,7 @@ def remove(n2_map):
         else:
             break
     return n2_map
+
 
 answer = []
 for _ in range(k):
