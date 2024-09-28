@@ -72,44 +72,51 @@ def update_item(pq):
         pq[i].update_profit()  # 각 상품의 이익을 갱신
     heapq.heapify(pq)  # 갱신된 상품 리스트를 다시 우선순위 큐로 만듭니다.
 
-Q = int(input())  # 명령어의 수 입력
-cmds = list(map(int, input().split()))
+# 메인 함수
+def main():
+    global Q, n, m, adj, cost, item_dict
+    Q = int(input())  # 명령어의 수 입력
+    cmds = list(map(int, input().split()))
+    
+    # 도시와 도로 정보를 입력받습니다.
+    n, m = cmds[1], cmds[2]
+    adj = [[] for _ in range(n)]  # 인접 리스트 초기화
+    for i in range(3, len(cmds), 3):
+        v, u, w = cmds[i:i + 3]
+        adj[v].append((u, w))  # v에서 u로 가는 도로 추가
+        adj[u].append((v, w))  # u에서 v로 가는 도로 추가
 
-# 도시와 도로 정보를 입력받습니다.
-n, m = cmds[1], cmds[2]
-adj = [[] for _ in range(n)]  # 인접 리스트 초기화
-for i in range(3, len(cmds), 3):
-    v, u, w = cmds[i:i + 3]
-    adj[v].append((u, w))  # v에서 u로 가는 도로 추가
-    adj[u].append((v, w))  # u에서 v로 가는 도로 추가
+    # 초기 출발지는 0번 도시로 설정하고 최단 경로를 계산합니다.
+    dijkstra(0)
+    
+    # 우선순위 큐를 사용하여 상품을 관리합니다.
+    pq_item = []
 
-# 초기 출발지는 0번 도시로 설정하고 최단 경로를 계산합니다.
-dijkstra(0)
+    for _ in range(Q - 1):
+        cmd = list(map(int, input().split()))  # 명령어 입력
+        if cmd[0] == 200:
+            # 상품을 등록하는 명령
+            _, item_id, revenue, dest = cmd
+            item = Item(item_id, revenue, dest)
+            heapq.heappush(pq_item, item)
+            item_dict[item_id] = 1  # 상품 활성화
+                
+        elif cmd[0] == 300:
+            # 상품을 취소하는 명령
+            _, item_id = cmd
+            item_dict[item_id] = 0  # 상품 비활성화
 
-# 우선순위 큐를 사용하여 상품을 관리합니다.
-pq_item = []
+        elif cmd[0] == 400:
+            # 상품을 판매하는 명령
+            ret = sell(pq_item)
+            print(ret)
 
-for _ in range(Q - 1):
-    cmd = list(map(int, input().split()))  # 명령어 입력
-    if cmd[0] == 200:
-        # 상품을 등록하는 명령
-        _, item_id, revenue, dest = cmd
-        item = Item(item_id, revenue, dest)
-        heapq.heappush(pq_item, item)
-        item_dict[item_id] = 1  # 상품 활성화
-            
-    elif cmd[0] == 300:
-        # 상품을 취소하는 명령
-        _, item_id = cmd
-        item_dict[item_id] = 0  # 상품 비활성화
+        elif cmd[0] == 500:
+            # 출발지를 변경하는 명령
+            _, s = cmd
+            dijkstra(s)  # 새로운 출발지에서 최단 경로를 계산
+            update_item(pq_item)  # 모든 상품의 이익을 갱신
 
-    elif cmd[0] == 400:
-        # 상품을 판매하는 명령
-        ret = sell(pq_item)
-        print(ret)
-
-    elif cmd[0] == 500:
-        # 출발지를 변경하는 명령
-        _, s = cmd
-        dijkstra(s)  # 새로운 출발지에서 최단 경로를 계산
-        update_item(pq_item)  # 모든 상품의 이익을 갱신
+# 메인 함수 실행
+if __name__ == '__main__':
+    main()
