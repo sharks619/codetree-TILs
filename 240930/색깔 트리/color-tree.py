@@ -9,7 +9,7 @@ def addnodes0(nodes_info_, abs_node_num, depth, id_, p_id_, c_, dmax_):
 
     return nodes_info_
 
-def addnodes(nodes_info_, abs_node_num, id_child_id, id_, p_id_, c_, dmax_):
+def addnodes(nodes_info_, abs_node_num, id_, p_id_, c_, dmax_):
     # if abs_node_num == 5:
         # print(id_, p_id_, c_, dmax_)
 
@@ -66,8 +66,6 @@ def calculate_dict_id_child_id(nodes_info_):
         elif i == 4:
             color_list = list(x)
             break
-        # elif i == 4:
-        #     dmax_list = list(x)
 
 
     id_child_id = dict()
@@ -78,9 +76,6 @@ def calculate_dict_id_child_id(nodes_info_):
     for id, color in zip(node_list, color_list):
         id_child_color[id] = [color]
 
-    # id_child_dmax = dict()
-    # for id, dmax in zip(node_list, dmax_list):
-    #     id_child_dmax[id] = [dmax]
 
     # print('node_list:', node_list)
     # print('pid_list:', pid_list)
@@ -102,12 +97,6 @@ def calculate_dict_id_child_id(nodes_info_):
             x.extend(id_child_color[id])
             # print(x)
             id_child_color[pid] = list(set(x))
-
-            # x = [j for j in id_child_dmax[pid]]
-            # # print(x)
-            # x.extend(id_child_dmax[id])
-            # # print(x)
-            # id_child_dmax[pid] = list(set(x))
 
     # print('id_child_id:', id_child_id)
     # print('id_child_color:', id_child_color)
@@ -131,16 +120,13 @@ for x in range(q):
     if cmds == 100:
         _, p_id, _, _ = [*args]
         if x > 0 and p_id != -1:
-            id_child_id, _ = calculate_dict_id_child_id(nodes_info)
-            nodes_info = addnodes(nodes_info, x, id_child_id, *args,)
+            nodes_info = addnodes(nodes_info, x, *args,)
         elif p_id == -1:
             nodes_info = addnodes0(nodes_info, x, 1, *args,)
-
 
     elif cmds == 200:
         id_child_id, _ = calculate_dict_id_child_id(nodes_info)
         nodes_info = change_color(nodes_info, id_child_id, *args)
-
 
     elif cmds == 300:
         color = search_color(nodes_info, *args)
