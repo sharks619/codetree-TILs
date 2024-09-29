@@ -18,9 +18,9 @@ def addnodes(nodes_info_, abs_node_num, id_child_id, id_, p_id_, c_, dmax_):
 
     return nodes_info_
 
-def change_color(nodes_info_, pid_, color_):
+def change_color(nodes_info_, id_child_id, pid_, color_):
     for n , [abs_node_num, id, pid, c, dmax] in enumerate(nodes_info_):
-        if (pid == pid_) or (id == pid_):
+        if id in id_child_id[pid_]:
             nodes_info_[n] = [abs_node_num, id, pid, color_, dmax]
 
     return nodes_info_
@@ -97,7 +97,8 @@ for x in range(q):
 
 
     elif cmds == 200:
-        nodes_info = change_color(nodes_info, *args)
+        id_child_id, _ = calculate_dict_id_child_id(nodes_info)
+        nodes_info = change_color(nodes_info, id_child_id, *args)
 
 
     elif cmds == 300:
