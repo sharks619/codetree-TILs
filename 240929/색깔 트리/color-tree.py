@@ -1,102 +1,110 @@
-from collections import defaultdict
-import sys
-input = sys.stdin.readline
+q = int(input())
 
-MAX_COLOR = 5
-PARENT = 1
-INF = float('inf')
 
-class Node:
-    def __init__(self, node_id, color=0, max_depth=0, parent=-1):
-        self.node_id = node_id
-        self.color = color
-        self.max_depth = max_depth
-        self.parent = parent
-        self.children = []
+def addnodes0(nodes_info_, abs_node_num, id_, p_id_, c_, dmax_):
 
-nodes = {}
-check_root = defaultdict(int)
+    node_info_ = [abs_node_num, id_, p_id_, c_, dmax_]
+    # print(node_info_)
+    nodes_info_.append(node_info_)
 
-# Create the root node with infinite depth
-nodes[0] = Node(0, color=0, max_depth=INF, parent=-1)
+    return nodes_info_
 
-def check_make_child(cur_node, depth):
-    if cur_node.node_id == 0:
-        return True
-    if cur_node.max_depth <= depth:
-        return False
-    return check_make_child(nodes[cur_node.parent], depth + 1)
+def addnodes(nodes_info_, abs_node_num, id_child_id, id_, p_id_, c_, dmax_):
 
-def add_node(m_id, p_id, color, max_depth):
-    if p_id == -1:
-        check_root[m_id] = PARENT
-    if check_root[m_id] == PARENT or (p_id in nodes and check_make_child(nodes[p_id], 1)):
-        nodes[m_id] = Node(m_id, color, max_depth, 0 if check_root[m_id] == PARENT else p_id)
-        if check_root[m_id] != PARENT:
-            nodes[p_id].children.append(m_id)
+    node_info_ = [abs_node_num, id_, p_id_, c_, dmax_]
+    for _, id, _, _, dmax in nodes_info_:
+        if id == p_id_ and len(id_child_id[id]) < dmax:
+            nodes_info_.append(node_info_)
 
-def dfs(node_id, color):
-    nodes[node_id].color = color
-    for child_id in nodes[node_id].children:
-        dfs(child_id, color)
+    return nodes_info_
 
-def change_color(m_id, color):
-    dfs(m_id, color)
+def change_color(nodes_info_, pid_, color_):
+    for n , [abs_node_num, id, pid, c, dmax] in enumerate(nodes_info_):
+        if (pid == pid_) or (id == pid_):
+            nodes_info_[n] = [abs_node_num, id, pid, color_, dmax]
 
-def retrieve_color(m_id):
-    print(nodes[m_id].color)
+    return nodes_info_
 
-def calculate(cur_node, color_count):
-    temp_color_count = [0] * (MAX_COLOR + 1)
-    temp_color_count[cur_node.color] = 1
+def search_color(nodes_info_, id_):
+    for abs_node_num, id, _, c, _ in nodes_info_:
+        if id == id_:
+            return c
 
-    sum_score = 0
-    for child_id in cur_node.children:
-        child = nodes[child_id]
-        child_color_count = [0] * (MAX_COLOR + 1)
-        score = calculate(child, child_color_count)
 
-        for i in range(1, MAX_COLOR + 1):
-            temp_color_count[i] += child_color_count[i]
+def calculate_dict_id_child_id(nodes_info_):
+    nodes_info_ = sorted(nodes_info_, reverse=True)
+    for i, x in enumerate(zip(*nodes_info_)):
+        if i == 1:
+            node_list = list(x)
+        elif i == 2:
+            pid_list = list(x)
+        elif i == 3:
+            color_list = list(x)
+            break
 
-        sum_score += score
+    id_child_id = dict()
+    for id in node_list:
+        id_child_id[id] = [id]
+    id_child_color = dict()
+    for id, color in zip(node_list, color_list):
+        id_child_color[id] = [color]
 
-    count = sum(1 for i in range(1, MAX_COLOR + 1) if temp_color_count[i])
-    sum_score += count ** 2
+    # print('node_list:', node_list)
+    # print('pid_list:', pid_list)
+    # print('color_list:', color_list)
 
-    for i in range(1, MAX_COLOR + 1):
-        color_count[i] += temp_color_count[i]
+    for id, pid, color in zip(node_list, pid_list, color_list):
+        if pid == -1:
+            continue
+        else:
+            x = [j for j in id_child_id[pid]]
+            # print(x)
+            x.extend(id_child_id[id])
+            # print(x)
+            id_child_id[pid] = list(set(x))
 
-    return sum_score
+            x = [j for j in id_child_color[pid]]
+            # print(x)
+            x.extend(id_child_color[id])
+            # print(x)
+            id_child_color[pid] = list(set(x))
+    # print('id_child_id:', id_child_id)
+    # print('id_child_color:', id_child_color)
 
-def get_score():
-    total_score = 0
-    color_count = [0] * (MAX_COLOR + 1)
-    for node_id, root_check in check_root.items():
-        if root_check == PARENT:
-            total_score += calculate(nodes[node_id], color_count)
-    return total_score
+    return id_child_id, id_child_color
 
-def retrieve_score():
-    print(get_score())
+def calculate_score(id_child_color):
+    score = 0
+    for k, v in id_child_color.items():
+        # print(k,v)
+        score += len(v)**2
 
-# Process the input and generate outputs
-Q = int(input())
+    return score
 
-for _ in range(Q):
-    command, *args = list(map(int, input().split()))
 
-    if command == 100:
-        m_id, p_id, color, max_depth = args
-        add_node(m_id, p_id, color, max_depth)
+nodes_info = list()
+for x in range(q):
+    # print('iter: ', x+1)
+    cmds, *args = list(map(int, input().split()))
+    # print('nodes_info:', nodes_info)
+    if cmds == 100:
+        _, p_id, _, _ = [*args]
+        if x > 0 and p_id != -1:
+            id_child_id, _ = calculate_dict_id_child_id(nodes_info)
+            nodes_info = addnodes(nodes_info, x, id_child_id, *args,)
+        elif p_id == -1:
+            nodes_info = addnodes0(nodes_info, x, *args,)
 
-    elif command == 200:
-        m_id, color = args
-        change_color(m_id, color)
 
-    elif command == 300:
-        m_id = args[0]
-        retrieve_color(m_id)
+    elif cmds == 200:
+        nodes_info = change_color(nodes_info, *args)
 
-    elif command == 400:
-        retrieve_score()
+
+    elif cmds == 300:
+        color = search_color(nodes_info, *args)
+        print(color)
+
+    elif cmds == 400:
+        id_child_id, id_child_color = calculate_dict_id_child_id(nodes_info)
+        score = calculate_score(id_child_color)
+        print(score)
