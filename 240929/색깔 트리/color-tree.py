@@ -1,11 +1,10 @@
 from collections import defaultdict
+import sys
+input = sys.stdin.readline
 
 MAX_COLOR = 5
-ADD_NODE = 100
-CHANGE_COLOR = 200
-RETRIEVE_COLOR = 300
-RETRIEVE_SCORE = 400
 PARENT = 1
+INF = float('inf')
 
 class Node:
     def __init__(self, node_id, color=0, max_depth=0, parent=-1):
@@ -19,7 +18,7 @@ nodes = {}
 check_root = defaultdict(int)
 
 # Create the root node with infinite depth
-nodes[0] = Node(0, color=0, max_depth=float('inf'), parent=-1)
+nodes[0] = Node(0, color=0, max_depth=INF, parent=-1)
 
 def check_make_child(cur_node, depth):
     if cur_node.node_id == 0:
@@ -82,24 +81,22 @@ def retrieve_score():
     print(get_score())
 
 # Process the input and generate outputs
-output_data = []
 Q = int(input())
 
 for _ in range(Q):
-    cmds = list(map(int, input().split()))
-    command = cmds[0]
+    command, *args = list(map(int, input().split()))
 
-    if command == ADD_NODE:
-        m_id, p_id, color, max_depth = cmds[1:]
+    if command == 100:
+        m_id, p_id, color, max_depth = args
         add_node(m_id, p_id, color, max_depth)
 
-    elif command == CHANGE_COLOR:
-        m_id, color = cmds[1:]
+    elif command == 200:
+        m_id, color = args
         change_color(m_id, color)
 
-    elif command == RETRIEVE_COLOR:
-        m_id = cmds[1]
+    elif command == 300:
+        m_id = args[0]
         retrieve_color(m_id)
 
-    elif command == RETRIEVE_SCORE:
+    elif command == 400:
         retrieve_score()
