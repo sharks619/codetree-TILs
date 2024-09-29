@@ -67,9 +67,7 @@ def calculate_dict_id_child_id(nodes_info_):
             color_list = list(x)
             break
 
-    id_child_id = dict()
-    for id in node_list:
-        id_child_id[id] = [id]
+    id_child_id = {id: set([id]) for id in node_list}
 
     # print('node_list:', node_list)
     # print('pid_list:', pid_list)
@@ -80,11 +78,7 @@ def calculate_dict_id_child_id(nodes_info_):
         if pid == -1:
             continue
         else:
-            x = [j for j in id_child_id[pid]]
-            # print(x)
-            x.extend(id_child_id[id])
-            # print(x)
-            id_child_id[pid] = list(set(x))
+            id_child_id[pid].update(id_child_id[id])
 
     # print('id_child_id:', id_child_id)
     # print('id_child_color:', id_child_color)
@@ -103,19 +97,13 @@ def calculate_dict_id_child_color(nodes_info_):
             break
 
 
-    id_child_color = dict()
-    for id, color in zip(node_list, color_list):
-        id_child_color[id] = [color]
+    id_child_color = {id: set([color]) for id, color in zip(node_list, color_list)}
 
     for id, pid, color in zip(node_list, pid_list, color_list):
         if pid == -1:
             continue
         else:
-            x = [j for j in id_child_color[pid]]
-            # print(x)
-            x.extend(id_child_color[id])
-            # print(x)
-            id_child_color[pid] = list(set(x))
+            id_child_color[pid].update(id_child_color[id])
 
     # print('id_child_id:', id_child_id)
     # print('id_child_color:', id_child_color)
