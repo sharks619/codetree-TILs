@@ -67,15 +67,9 @@ def calculate_dict_id_child_id(nodes_info_):
             color_list = list(x)
             break
 
-
     id_child_id = dict()
     for id in node_list:
         id_child_id[id] = [id]
-
-    id_child_color = dict()
-    for id, color in zip(node_list, color_list):
-        id_child_color[id] = [color]
-
 
     # print('node_list:', node_list)
     # print('pid_list:', pid_list)
@@ -92,6 +86,31 @@ def calculate_dict_id_child_id(nodes_info_):
             # print(x)
             id_child_id[pid] = list(set(x))
 
+    # print('id_child_id:', id_child_id)
+    # print('id_child_color:', id_child_color)
+
+    return id_child_id
+
+def calculate_dict_id_child_color(nodes_info_):
+    nodes_info_ = sorted(nodes_info_, reverse=True)
+    for i, x in enumerate(zip(*nodes_info_)):
+        if i == 2:
+            node_list = list(x)
+        elif i == 3:
+            pid_list = list(x)
+        elif i == 4:
+            color_list = list(x)
+            break
+
+
+    id_child_color = dict()
+    for id, color in zip(node_list, color_list):
+        id_child_color[id] = [color]
+
+    for id, pid, color in zip(node_list, pid_list, color_list):
+        if pid == -1:
+            continue
+        else:
             x = [j for j in id_child_color[pid]]
             # print(x)
             x.extend(id_child_color[id])
@@ -101,7 +120,7 @@ def calculate_dict_id_child_id(nodes_info_):
     # print('id_child_id:', id_child_id)
     # print('id_child_color:', id_child_color)
 
-    return id_child_id, id_child_color
+    return id_child_color
 
 def calculate_score(id_child_color):
     score = 0
@@ -125,7 +144,7 @@ for x in range(q):
             nodes_info = addnodes0(nodes_info, x, 1, *args,)
 
     elif cmds == 200:
-        id_child_id, _ = calculate_dict_id_child_id(nodes_info)
+        id_child_id = calculate_dict_id_child_id(nodes_info)
         nodes_info = change_color(nodes_info, id_child_id, *args)
 
     elif cmds == 300:
@@ -133,7 +152,7 @@ for x in range(q):
         print(color)
 
     elif cmds == 400:
-        id_child_id, id_child_color = calculate_dict_id_child_id(nodes_info)
+        id_child_color = calculate_dict_id_child_color(nodes_info)
         score = calculate_score(id_child_color)
         print(score)
 
