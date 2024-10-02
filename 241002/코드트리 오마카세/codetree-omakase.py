@@ -1,66 +1,105 @@
-from collections import deque
+import heapq 
+from collections import defaultdict
 
-l, q = map(int, input().split())
-
-qeque = deque()
-# 초밥을 담을 배열 추가
-for _ in range(l):
-    qeque.append(deque())
-
-people_dict = {}
-# 이전 시간 기록 ( 초밥 회전을 위해 ), 초밥 갯수
-prev_time, cnt = 0, 0
+l, q = map(int,input().split())
+# 전체 쿼리 저장 
+query = []
+# 사람 별 도착 시간 저장 
+entry_time = {}
+# 사람 별 위치 저장 
+position = {}
+# 사람 별 떠나는 시간 저장 
+exit_time = defaultdict(int)
+# 사람 이름 저장 
+names = set()
+# 사람 별 쿼리 저장 
+p_queries = defaultdict(list)
 
 for _ in range(q):
-    cmd, *args = list(map(str, input().split()))
-    t = int(args[0])
-    # 시간만큼 초밥 회전하기
-    qeque.rotate(t - prev_time)
-    prev_time = t
-
-    # 초밥 만들기
-    if cmd == '100':
-        x, name = args[1:]
+    data = list(map(str,input().split()))
+    q_type = int(data[0])
+    t, x, n = -1 ,-1 ,-1
+    name = ""
+    # 스시 들어옴 
+    if q_type == 100 :
+        # 들어온 시간, 위치, 사람 이름 
+        t, x, name = data[1:]
+        t = int(t)
         x = int(x)
-        qeque[x].append(name)
-        cnt += 1
-    # 손님
-    if cmd == '200':
-        # 손님 추가하기
-        x, name, n = args[1:]
+    if q_type == 200 :
+        # 들어온 시간, 위치, 사람 이름, 초밥 개수 
+        t, x, name, n = data[1:]
+        t = int(t)
         x = int(x)
         n = int(n)
+    if q_type == 300 :
+        # 사진 촬영 
+        t = int(data[1])
 
-        if x not in people_dict:
-            people_dict[x] = [name, n]
-        elif people_dict[x][0] == "":
-            people_dict[x] = [name, n]
-    # 초밥 먹기
-    for i in range(l):
-        sub_list = []
-        while qeque[i]:
-            now_name = qeque[i].popleft()
+    # t와 cmd 순서대로 
+    # t가 같다면 초밥 만들고 -> 즉시 초밥 사라지고 -> 새로운 손님 입장하고 -> 손님 사라지고 -> 사진 촬영 순으로
+    heapq.heappush(query, (t, q_type, x, name, n))
 
-            # 사람이 있을 경우
-            if i in people_dict and people_dict[i][0] == now_name:
-                if people_dict[i][1] > 0:
-                    people_dict[i][1] -= 1
-                    cnt -= 1
-                # 초기화
-                if people_dict[i][1] == 0:
-                    people_dict[i][0] = ""
-            else:
-                sub_list.append(now_name)
-        # 먹지 못한 초밥 다시 넣어놓기
-        for sub in sub_list:
-            qeque[i].append(sub)
+    if q_type == 100 :
+        p_queries[name].append((t, q_type, x, name,n))
+    if q_type == 200 :
+        names.add(name)
+        entry_time[name] = t 
+        position[name] = x
 
-    # 사진 찍기
-    if cmd == '300':
-        people_cnt = 0
 
-        for k, v in people_dict.items():
-            if v[0] != "":
-                people_cnt += 1
+for name in names :
 
-        print(people_cnt, cnt)
+    for t, cmd, x, p_n, n in p_queries[name]:
+        #print(t, cmd, x, p_n, n, entry_time[name], position[name])
+        # 초밥과 손님이 만나는 시간 
+        match_time = 0 
+
+        # 초밥이 사람이 오기 전에 주어짐 
+        if t < entry_time[name]:
+            t_diff = entry_time[name] - t 
+            # 사람이 들어왔을 때 스시 위치 
+            s_pos = (x + t_diff) % l
+            match_time = entry_time[name]
+            if position[name] > s_pos :
+                add_time = position[name] - s_pos
+                match_time += add_time
+            elif s_pos > position[name]:
+                add_time = l - (s_pos - position[name])
+                match_time += add_time
+        else :
+            match_time = t
+            if position[name] > x :
+                add_time = position[name] - x
+                match_time += add_time
+            elif x > position[name]:
+                add_time = l - (x - position[name])
+                match_time += add_time
+        
+        # 초밥 먹는 가장 늦은 시간 갱신
+        exit_time[name] = max(exit_time[name], match_time)
+
+        # 초밥 사라지는 쿼리 추가 
+        heapq.heappush(query, (match_time, 111, -1, name, -1))
+
+# 사람 떠나는 쿼리 추가 
+for name in names:
+    heapq.heappush(query, (exit_time[name], 222, -1, name, -1))
+
+p_num = 0
+s_num = 0 
+
+while query:
+    data = heapq.heappop(query)
+    cmd = data[1]
+
+    if cmd == 100:
+        s_num += 1 
+    elif cmd == 111 :
+        s_num -=1 
+    elif cmd == 200:
+        p_num += 1 
+    elif cmd == 222 :
+        p_num -= 1 
+    else :
+        print(p_num, s_num)
