@@ -68,9 +68,9 @@ def race(k, s):
                 nr = r - dist
                 if nr < 0:
                     nr = dist - r
-                    if nc > n - 1:
-                        over = nc - (n - 1)
-                        nc = n - 1 - over
+                    if nr > n - 1:
+                        over = nr - (n - 1)
+                        nr = n - 1 - over
                 sub.append((nr + c, nr, c))
                 # print(nr, c)
 
