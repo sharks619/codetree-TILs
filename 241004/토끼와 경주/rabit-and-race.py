@@ -1,3 +1,4 @@
+import sys
 import heapq
 from collections import defaultdict
 
@@ -7,6 +8,8 @@ rabbits = []
 score_dic = defaultdict(int)
 dist_dic = defaultdict(int)
 alpha_score = 0
+
+input = sys.stdin.readline
 
 q = int(input())
 _, n, m, p, *args = list(map(int, input().split()))
