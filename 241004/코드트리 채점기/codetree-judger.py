@@ -1,93 +1,76 @@
-import heapq
-from collections import defaultdict
+from heapq import heappush, heappop, heapify
+import sys
+input = sys.stdin.readline
+MAX = float('inf')
 
-q = int(input())
+Q = int(input())
+querys = [input().split() for _ in range(Q)]
+grading_domain = dict()
+prev_ended_domain = dict()
+domains = set()
+waited_task = dict()
+waited_url = set()
+tot_waited = 0
 
-waiting_q = []
-waiting_c = 0
-judging_dic = defaultdict()
+for i in range(Q) :
+    query, *body = querys[i]
+    if query <= '200' :
+        domain = body[-1].split('/')[0]
+        domains.add(domain)
+        grading_domain[domain] = False
+        prev_ended_domain[domain] = -1
+        if domain not in waited_task :
+            waited_task[domain] = list()
 
-waiting_u_set = set()  # URL을 빠르게 조회하기 위해 집합 사용
-judging_d_set = set()  # Domain을 빠르게 조회하기 위해 집합 사용
-history_d_dic = {}  # Domain의 처리 시작/종료 시간을 기록
+_, N, u0 = querys[0]
+d0 = u0.split('/')[0]
+graders = [(-1,-1) for _ in range(int(N))]
+empty_graders = list(range(int(N)))
+heapify(empty_graders)
+heappush(waited_task[d0], (1, 0, u0))
+waited_url.add(u0)
+tot_waited += 1
 
-_, n, u = list(map(str, input().split()))
-n = int(n)
-domain, id = u.split('/')
-heapq.heappush(waiting_q, (1, 0, u))
-waiting_u_set.add(u)
-waiting_j_q = list(range(1, n + 1))
-heapq.heapify(waiting_j_q)
-waiting_c += 1
-
-
-for _ in range(q-1):
-    cmd, *args = list(map(str, input().split()))
-    cmd = int(cmd)
-    # print("cmd, *args:", cmd, *args)
-    # print('작업전')
-    # print("waiting_q:", waiting_q)
-    # print("judging_dic:", judging_dic)
-    # print("history_d_dic:", history_d_dic)
-
-    if cmd == 200:
-        t, p, url = int(args[0]), int(args[1]), args[2]
-
-        if url not in waiting_u_set:
-            heapq.heappush(waiting_q, (p, t, url))
-            waiting_u_set.add(url)
-            waiting_c += 1
-
-    elif cmd == 300:
-        t = int(args[0])
-
-        if not waiting_j_q: # 쉬고 있는 채점기가 없다면 무시
+for i in range(1, Q) :
+    query, *body = querys[i]
+    if query == '200' :
+        t, p, u = body
+        d = u.split('/')[0]
+        if u in waited_url :
             continue
-
-        if not waiting_q:  # 대기 중인 작업이 없으면 무시
+        waited_url.add(u)
+        heappush(waited_task[d], (int(p), int(t), u))
+        tot_waited += 1
+    elif query == '300' :
+        if not empty_graders or not tot_waited:
             continue
-
-        cp, ct, cu = heapq.heappop(waiting_q)
-        waiting_c -= 1
-        c_domain, c_id = cu.split('/')
-
-        if c_domain in judging_d_set:
-            heapq.heappush(waiting_q, (cp, ct, cu))
-            waiting_c += 1
-            continue
-
-        if c_domain in history_d_dic.keys():
-            s, e = history_d_dic[c_domain]
-            if t < s + 3*(e-s):
-                heapq.heappush(waiting_q, (cp, ct, cu))
-                waiting_c += 1
+        t = int(body[0])
+        target_d, priority, target_u = '', (MAX, MAX), ''
+        for d in domains :
+            if grading_domain[d] or prev_ended_domain[d] > t or not waited_task[d]:
                 continue
+            tp, tt, tu = waited_task[d][0]
+            if priority <= (tp, tt) :
+                continue
+            target_d, priority, target_u = d, (tp, tt), tu
 
-        jid = heapq.heappop(waiting_j_q)
-        judging_dic[jid] = (t, cu)
-        waiting_u_set.remove(cu)
-        judging_d_set.add(c_domain)
+        if priority < (MAX, MAX) :
+            idx = heappop(empty_graders)
+            grading_domain[target_d] = True
+            waited_url.discard(target_u)
+            graders[idx] = (t, target_d)
+            heappop(waited_task[target_d])
+            tot_waited -= 1
 
-    elif cmd == 400:
-        t, j_id = int(args[0]), int(args[1])
-
-        # 채점 중이던 작업이 없으면 무시
-        if j_id not in judging_dic:
+    elif query == '400' :
+        t, idx = map(int, body)
+        idx -= 1
+        if graders[idx] == (-1, -1) :
             continue
-
-        c_t, c_url = judging_dic[j_id]
-        c_domain = c_url.split('/')[0]
-
-        del judging_dic[j_id]
-        judging_d_set.remove(c_domain)
-
-        heapq.heappush(waiting_j_q, j_id)
-        history_d_dic[c_domain] = [c_t, t]
-
-    elif cmd == 500:
-        print(waiting_c)
-
-    # print('작업후')
-    # print("waiting_q:", waiting_q)
-    # print("judging_dic:", judging_dic)
-    # print("history_d_dic:", history_d_dic)
+        s, d = graders[idx]
+        graders[idx] = (-1, -1)
+        grading_domain[d] = False
+        prev_ended_domain[d] = s + (t - s)*3
+        heappush(empty_graders, idx)
+    else :
+        print(tot_waited)
