@@ -1,3 +1,4 @@
+import sys
 import heapq
 from collections import defaultdict
 
@@ -6,6 +7,8 @@ dirs = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 rabbits = []
 score_dic = defaultdict(int)
 dist_dic = defaultdict(int)
+
+input = sys.stdin.readline
 
 q = int(input())
 _, n, m, p, *args = list(map(int, input().split()))
@@ -36,7 +39,8 @@ def race(k, s):
                 dist %= 2 * (m - 1)
                 nc = c + dist
                 if nc > m - 1:
-                    nc = (m - 1) - (dist - (m - c - 1))
+                    over = c + dist - (m - 1)
+                    nc = (m - 1) - over
                     if nc < 0:
                         nc = abs(nc)
                 sub.append((r + nc, r, nc))
@@ -46,7 +50,8 @@ def race(k, s):
                 dist %= 2 * (n - 1)
                 nr = r + dist
                 if nr > n - 1:
-                    nr = (n - 1) - (dist - (n - r - 1))
+                    over = r + dist - (n - 1)
+                    nr = (n - 1) - over
                     if nr < 0:
                         nr = abs(nr)
                 sub.append((nr + c, nr, c))
