@@ -1,64 +1,75 @@
-from collections import deque, defaultdict
-
 n,q = map(int, input().split())
 
 _, *args = list(map(int, input().split()))
 
-dic_c_node = defaultdict(list) # 자식 노드
-dic_p_node = defaultdict(int) # 부모 노드
-dic_on_off = defaultdict(bool)
-dic_power = defaultdict(int)
+parents = [0] * (n + 1)
+children = [[] for _ in range(n + 1)]
+turn_on = [True] * (n + 1)
+power = [0] * (n + 1)
+authorities = [[0] * 21 for _ in range(n + 1)]
 
 for i in range(n):
-    p, a = args[i], args[i+n]
-    dic_c_node[p].append(i+1)
-    dic_p_node[i+1] = p
-    dic_on_off[i+1] = True
-    dic_power[i+1] = min(a, 20)
+    parents[i + 1] = args[i]
+    power[i + 1] = min(20, args[i + n])
 
-def count(c, l):
-    total_cnt = 0
+for i in range(1, n + 1):
+    children[parents[i]].append(i)
 
-    q = deque([(c, l)])
-    while q:
-        c_c, c_l = q.popleft()
-        c_l += 1
-        for i in dic_c_node.get(c_c, []):  # 빈 리스트 자동 추가 방지
-            if dic_on_off[i]:
-                if dic_power[i] > c_l:
-                    total_cnt += 1
-                q.append((i, c_l))
+    p, idx = power[i], i
+    while p >= 0:
+        authorities[idx][p] += 1
+        p -= 1
+        if idx == parents[idx]: break
+        idx = parents[idx]
 
-    return total_cnt
+def update(idx):
+    authorities[idx] = [0] * 21
+    authorities[idx][power[idx]] += 1
 
+    for child in children[idx]:
+        if not turn_on[child]: continue
+        for i, val in enumerate(authorities[child][1:]):
+            authorities[idx][i] += val
+
+    if idx != parents[idx]:
+        update(parents[idx])
+
+def power_change(idx, p):
+    power[idx] = min(20, p)
+    update(idx)
 
 for _ in range(q-1):
     cmd, *args = list(map(int, input().split()))
 
     if cmd==200:
         c = args[0]
-        if dic_on_off[c]:
-            dic_on_off[c] = False
-        else:
-            dic_on_off[c] = True
+        turn_on[c] = False if turn_on[c] else True
+        update(parents[c])
 
     elif cmd == 300:
-        c, power = args[0], args[1]
-        dic_power[c] = power
+        c, p = args[0], args[1]
+        power_change(c, p)
 
     elif cmd == 400:
         c1, c2 = args[0], args[1]
-        c1p = dic_p_node[c1]
-        c2p = dic_p_node[c2]
 
-        dic_c_node[c1p].remove(c1)
-        dic_c_node[c1p].append(c2)
+        c1p = parents[c1]
+        c2p = parents[c2]
 
-        dic_c_node[c2p].remove(c2)
-        dic_c_node[c2p].append(c1)
+        if c1p == c2p:
+            continue
 
-        dic_p_node[c1], dic_p_node[c2] = dic_p_node[c2], dic_p_node[c1]
+        parents[c1], parents[c2] = parents[c2], parents[c1]
+
+        children[c1p].remove(c1)
+        children[c1p].append(c2)
+
+        children[c2p].remove(c2)
+        children[c2p].append(c1)
+
+        update(c1p)
+        update(c2p)
 
     elif cmd == 500:
         c = args[0]
-        print(count(c,-1))
+        print(sum(authorities[c])-1)
