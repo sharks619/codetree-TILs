@@ -27,9 +27,10 @@ def count(c, l):
     while q:
         c_c, c_l = q.popleft()
         c_l += 1
-        for i in dic_c_node[c_c]:
+        for i in dic_c_node.get(c_c, []):  # 빈 리스트 자동 추가 방지
             if dic_on_off[i]:
                 if dic_power[i] > c_l:
+                    print("i, c_l:", i, c_l)
                     total_cnt += 1
                 q.append((i, c_l))
 
