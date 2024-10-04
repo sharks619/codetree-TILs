@@ -1,4 +1,7 @@
+import sys
 from collections import deque, defaultdict
+
+input = sys.stdin.readline
 
 n,q = map(int, input().split())
 
@@ -27,7 +30,6 @@ def count(c, l):
         for i in dic_c_node[c_c]:
             if dic_on_off[i]:
                 if dic_power[i] > c_l:
-                    # print("i,c_l:", i, c_l)
                     total_cnt += 1
                 q.append((i, c_l))
 
@@ -35,17 +37,6 @@ def count(c, l):
 
 for _ in range(q-1):
     cmd, *args = list(map(int, input().split()))
-
-    # print()
-    # print(cmd, *args)
-    # print()
-    #
-    # print("변경전")
-    # print("dic_c_node:", dic_c_node)
-    # print("dic_p_node:", dic_p_node)
-    # print("dic_on_off:", dic_on_off)
-    # print("dic_power:", dic_power)
-
 
     if cmd==200:
         c = args[0]
@@ -70,14 +61,7 @@ for _ in range(q-1):
         dic_c_node[c2p].append(c1)
 
         dic_p_node[c1], dic_p_node[c2] = dic_p_node[c2], dic_p_node[c1]
-        # dic_on_off[c1], dic_on_off[c2] = dic_on_off[c2], dic_on_off[c1]
 
     elif cmd == 500:
         c = args[0]
         print(count(c,-1))
-    #     print("답:", count(c,-1))
-    # print("변경후")
-    # print("dic_c_node:", dic_c_node)
-    # print("dic_p_node:", dic_p_node)
-    # print("dic_on_off:", dic_on_off)
-    # print("dic_power:", dic_power)
