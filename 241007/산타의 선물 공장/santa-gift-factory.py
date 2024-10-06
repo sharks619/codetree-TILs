@@ -24,7 +24,7 @@ def down(x):
                 ans += c_w
                 belt_s[i].remove(c_id)
             else:
-                belt_q[i].append((c_id,c_w)) # 뒤가 아닌 앞에 다시 넣기!
+                belt_q[i].append((c_id,c_w))
     return ans
 
 def remove_box(x):
@@ -38,12 +38,10 @@ def remove_box(x):
 
 def check_box(x):
     for i in range(m):
-        cnt = 0
-        for c_id,c_w in belt_q[i]:
-            cnt += 1
-            if c_id==x:
-                belt_q[i].rotate(-1*cnt)
-                return i+1
+        for idx, (c_id, c_w) in enumerate(belt_q[i]):
+            if c_id == x:
+                belt_q[i].rotate(-idx)
+                return i + 1
     return -1
 
 def move_box(x):
