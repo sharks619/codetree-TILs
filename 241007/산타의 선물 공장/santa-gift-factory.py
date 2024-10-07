@@ -102,7 +102,7 @@ def box_check(x):
 
         # head 갱신
         head[belt_n] = x
-        prv[x] = 0
+        # prv[x] = 0
 
         # tail 갱신
         tail[belt_n] = p_id
