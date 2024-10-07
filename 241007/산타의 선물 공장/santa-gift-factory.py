@@ -36,6 +36,7 @@ def box_down(x):
             # w_max 이하라면 하차
             if weight[h_id] <= x:
                 ans += weight[h_id]
+                belt_num[h_id] = -1
                 head[i] = nxt[h_id]
                 prv[h_id] = 0
                 nxt[h_id] = 0
@@ -46,6 +47,7 @@ def box_down(x):
                 # 벨트 위 박스 1개인 경우
                 else:
                     tail[i] = 0
+
             # 아니면 맨 뒤로 이동
             else:
                 tail[i] = h_id
@@ -54,7 +56,6 @@ def box_down(x):
                 nxt[t_id] = h_id
                 prv[h_id] = t_id
                 nxt[h_id] = 0
-            belt_num[h_id] = -1
 
     return ans
 
@@ -170,6 +171,7 @@ for _ in range(q-1):
     # print("전")
     # print("head", head)
     # print("tail", tail)
+    # print("belt_num", belt_num)
     # print("prv", prv)
     # print("nxt", nxt)
     # print()
@@ -195,6 +197,7 @@ for _ in range(q-1):
     # print("후")
     # print("head", head)
     # print("tail", tail)
+    # print("belt_num", belt_num)
     # print("prv", prv)
     # print("nxt", nxt)
     # print()
