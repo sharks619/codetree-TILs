@@ -37,6 +37,9 @@ def box_down(x):
             if weight[h_id] <= x:
                 ans += weight[h_id]
                 head[i] = nxt[h_id]
+                prv[h_id] = 0
+                nxt[h_id] = 0
+
                 # 벨트 위 박스 2개 이상인 경우
                 if head[i] != 0:
                     prv[head[i]] = 0
@@ -47,9 +50,9 @@ def box_down(x):
             else:
                 tail[i] = h_id
                 head[i] = nxt[h_id]
-                prv[h_id] = t_id
                 nxt[t_id] = h_id
-            nxt[h_id] = 0
+                prv[h_id] = t_id
+                nxt[h_id] = 0
             belt_num[h_id] = -1
 
     return ans
@@ -156,6 +159,7 @@ def box_move(x):
     head[x-1] = tail[x-1] = 0
 
     return x
+
 
 for _ in range(q-1):
     cmd, *args = list(map(int, input().split()))
