@@ -71,7 +71,7 @@ def box_remove(x):
     # head일 경우
     elif x == h_id:
         head[belt_n] = n_id
-        prv[n_id] = 0
+        # prv[n_id] = 0
 
     # tail일 경우
     elif x == t_id:
@@ -160,6 +160,15 @@ def box_move(x):
 for _ in range(q-1):
     cmd, *args = list(map(int, input().split()))
 
+    # print()
+    # print(cmd, *args)
+    # print("전")
+    # print("head", head)
+    # print("tail", tail)
+    # print("prv", prv)
+    # print("nxt", nxt)
+    # print()
+
     if cmd == 200:
         w_max = args[0]
         print(box_down(w_max))
@@ -175,3 +184,12 @@ for _ in range(q-1):
     elif cmd == 500:
         b_num = args[0]
         print(box_move(b_num))
+
+    # print()
+    # print(cmd, *args)
+    # print("후")
+    # print("head", head)
+    # print("tail", tail)
+    # print("prv", prv)
+    # print("nxt", nxt)
+    # print()
