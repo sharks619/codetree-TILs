@@ -50,6 +50,7 @@ def box_down(x):
             else:
                 tail[i] = h_id
                 head[i] = nxt[h_id]
+                prv[nxt[h_id]] = 0
                 nxt[t_id] = h_id
                 prv[h_id] = t_id
                 nxt[h_id] = 0
