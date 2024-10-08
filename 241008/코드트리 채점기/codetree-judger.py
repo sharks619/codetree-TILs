@@ -50,22 +50,28 @@ for _ in range(q-1):
         if not waiting_j_q: # 쉬고 있는 채점기가 없다면 무시
             continue
 
-        if not waiting_q:  # 대기 중인 작업이 없으면 무시
-            continue
+        temp_q = []
 
-        cp, ct, cu = heapq.heappop(waiting_q)
-        waiting_q_cnt -= 1
-        c_domain, c_id = cu.split('/')
+        while waiting_q:
+            cp, ct, cu = heapq.heappop(waiting_q)
+            c_domain, c_id = cu.split('/')
 
-        if c_domain in judging_d_set or (c_domain in history_d_dic and t < history_d_dic[c_domain][0] + 3 * (history_d_dic[c_domain][1] - history_d_dic[c_domain][0])):
-            heapq.heappush(waiting_q, (cp, ct, cu))
-            waiting_q_cnt += 1
-            continue
+            if c_domain in judging_d_set:
+                temp_q.append((cp, ct, cu))
+            elif (c_domain in history_d_dic) and (t < history_d_dic[c_domain][0] + 3 * (history_d_dic[c_domain][1] - history_d_dic[c_domain][0])):
+                temp_q.append((cp, ct, cu))
+            else:
+                jid = heapq.heappop(waiting_j_q)
+                judging_dic[jid] = (t, cu)
+                waiting_u_set.remove(cu)
+                judging_d_set.add(c_domain)
+                waiting_q_cnt -= 1  # 처리된 작업이므로 대기 큐 카운트 감소
+                break
+        for item in temp_q:
+            heapq.heappush(waiting_q, item)
 
-        jid = heapq.heappop(waiting_j_q)
-        judging_dic[jid] = (t, cu)
-        waiting_u_set.remove(cu)
-        judging_d_set.add(c_domain)
+        if not temp_q:
+            waiting_q_cnt += len(temp_q)
 
     elif cmd == 400:
         t, j_id = int(args[0]), int(args[1])
