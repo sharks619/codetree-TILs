@@ -9,15 +9,15 @@ prv = defaultdict(lambda: 0)
 nxt = defaultdict(lambda: 0)
 head = [0] * MAX_N  # 각 벨트의 첫 번째 상자
 tail = [0] * MAX_N  # 각 벨트의 마지막 상자
-belt_num = defaultdict(lambda: 0)  # 각 상자의 벨트 번호
-# num_gift = [0] * MAX_N
+num_gift = [0] * MAX_N
 
 
+boxes = [[] for _ in range(n)]
 for i in range(m):
     box_loc = args[i]-1
     box_id = i+1
 
-    belt_num[box_id] = box_loc
+    boxes[box_loc].append(box_id)
 
     if head[box_loc] == 0:
         head[box_loc] = box_id
@@ -28,46 +28,19 @@ for i in range(m):
     tail[box_loc] = box_id
     nxt[box_id] = 0
 
-def box_count(b_num):
-    h_id = head[b_num-1]
+for i in range(n):
+    num_gift[i] = len(boxes[i])
 
-    if h_id == 0:
-        return 0
-    c = 1
-    while True:
-        n_id = nxt[h_id]
-        if n_id != 0:
-            c += 1
-            h_id = n_id
-        else:
-            break
-
-    return c
 
 def move_all(a,b):
     # a 선물 x
-    if head[a-1]==0:
-        return box_count(b)
-
-    # a 선물 belt_num b로 변경
-    a_id = head[a-1]
-    while True:
-        belt_num[a_id] = b-1
-        n_id = nxt[a_id]
-        if n_id != 0:
-            belt_num[n_id] = b-1
-            a_id = n_id
-        else:
-            break
+    if num_gift[a-1]==0:
+        return num_gift[b-1]
 
     # b 선물 x
-    if head[b-1]==0:
+    if num_gift[b-1]==0:
         head[b-1] = head[a-1]
         tail[b-1] = tail[a-1]
-
-        head[a-1] = tail[a-1] = 0
-
-        return box_count(b)
 
     # 둘 다 선물 존재
     else:
@@ -79,9 +52,12 @@ def move_all(a,b):
         prv[bh_id] = at_id
         nxt[at_id] = bh_id
 
-        head[a-1] = tail[a-1] = 0
+    head[a-1] = tail[a-1] = 0
 
-        return box_count(b)
+    num_gift[b-1] += num_gift[a-1]
+    num_gift[a-1] = 0
+
+    return num_gift[b-1]
 
 def replace_first(a,b):
     ah_id = head[a-1]
@@ -100,7 +76,6 @@ def replace_first(a,b):
         tail[a-1] = bh_id
         prv[bh_id] = 0
         nxt[bh_id] = 0
-        belt_num[bh_id] = a-1
 
         # b 벨트 정보 변경
         # b 박스 1개 인지 확인
@@ -110,7 +85,8 @@ def replace_first(a,b):
             head[b-1] = bn_id
             prv[bn_id] = 0
 
-        return box_count(b)
+        num_gift[a-1] += 1
+        num_gift[b-1] -= 1
 
     # b 만 없음
     elif bh_id == 0:
@@ -129,9 +105,9 @@ def replace_first(a,b):
         tail[b-1] = ah_id
         prv[ah_id] = 0
         nxt[ah_id] = 0
-        belt_num[ah_id] = b-1
 
-        return box_count(b)
+        num_gift[a-1] -= 1
+        num_gift[b-1] += 1
 
     else:
         an_id = nxt[ah_id]
@@ -148,8 +124,6 @@ def replace_first(a,b):
         else:
             prv[an_id] = bh_id
 
-        belt_num[bh_id] = a-1
-
         # b 벨트 정보 변경
         head[b - 1] = ah_id
         prv[ah_id] = 0
@@ -161,23 +135,20 @@ def replace_first(a,b):
         else:
             prv[bn_id] = ah_id
 
-        belt_num[ah_id] = b-1
-
-        return box_count(b)
+    return num_gift[b-1]
 
 def box_share(a,b):
-    num = box_count(a)//2
+    num = num_gift[a-1]//2
 
     if num==0:
-        return box_count(b)
+        return num_gift[b-1]
 
-    # a 선물 belt_num b로 변경
+    # 이동할 a 박스 id 추출 / 시작:a_id, 끝: new_b_id
     a_id = head[a-1]
 
     c = 0
     a_num = a_id
     while True:
-        belt_num[a_num] = b-1
         a_num = nxt[a_num]
         c += 1
         if c == num:
@@ -208,7 +179,10 @@ def box_share(a,b):
         nxt[new_b_id] = bh_id
         prv[bh_id] = new_b_id
 
-    return box_count(b)
+    num_gift[a - 1] -= num
+    num_gift[b - 1] += num
+
+    return num_gift[b-1]
 
 def box_info(x):
     a = prv[x]
@@ -223,7 +197,7 @@ def box_info(x):
 def belt_info(x):
     a = head[x-1]
     b = tail[x-1]
-    c = box_count(x)
+    c = num_gift[x-1]
     if a == 0:
         a = -1
     if b == 0:
