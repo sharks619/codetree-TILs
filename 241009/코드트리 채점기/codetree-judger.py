@@ -2,7 +2,7 @@ import sys
 import heapq
 from collections import defaultdict
 
-input = sys.stdin.readline()
+input = sys.stdin.readline
 q = int(input())
 
 waiting_q = [] # 채점 대기 큐에 있는 채점 task
