@@ -1,4 +1,7 @@
+import sys
 from collections import defaultdict
+
+input = sys.stdin.readline
 
 q = int(input())
 _,n,m,*args = list(map(int, input().split()))
