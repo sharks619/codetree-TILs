@@ -1,16 +1,17 @@
-import sys
 from collections import defaultdict
-
-input = sys.stdin.readline
 
 q = int(input())
 _,n,m,*args = list(map(int, input().split()))
 
+MAX_N = 100000
+
 prv = defaultdict(lambda: 0)
 nxt = defaultdict(lambda: 0)
-head = [0] * n  # 각 벨트의 첫 번째 상자
-tail = [0] * n  # 각 벨트의 마지막 상자
+head = [0] * MAX_N  # 각 벨트의 첫 번째 상자
+tail = [0] * MAX_N  # 각 벨트의 마지막 상자
 belt_num = defaultdict(lambda: 0)  # 각 상자의 벨트 번호
+# num_gift = [0] * MAX_N
+
 
 for i in range(m):
     box_loc = args[i]-1
