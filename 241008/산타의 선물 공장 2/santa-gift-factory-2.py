@@ -48,10 +48,10 @@ def move_all(a,b):
     # a 선물 belt_num b로 변경
     a_id = head[a-1]
     while True:
-        belt_num[a_id] = b
+        belt_num[a_id] = b-1
         n_id = nxt[a_id]
         if n_id != 0:
-            belt_num[n_id] = b
+            belt_num[n_id] = b-1
             a_id = n_id
         else:
             break
@@ -96,7 +96,7 @@ def replace_first(a,b):
         tail[a-1] = bh_id
         prv[bh_id] = 0
         nxt[bh_id] = 0
-        belt_num[bh_id] = a
+        belt_num[bh_id] = a-1
 
         # b 벨트 정보 변경
         # b 박스 1개 인지 확인
@@ -125,7 +125,7 @@ def replace_first(a,b):
         tail[b-1] = ah_id
         prv[ah_id] = 0
         nxt[ah_id] = 0
-        belt_num[ah_id] = b
+        belt_num[ah_id] = b-1
 
         return box_count(b)
 
@@ -144,7 +144,7 @@ def replace_first(a,b):
         else:
             prv[an_id] = bh_id
 
-        belt_num[bh_id] = a
+        belt_num[bh_id] = a-1
 
         # b 벨트 정보 변경
         head[b - 1] = ah_id
@@ -157,7 +157,7 @@ def replace_first(a,b):
         else:
             prv[bn_id] = ah_id
 
-        belt_num[ah_id] = b
+        belt_num[ah_id] = b-1
 
         return box_count(b)
 
@@ -173,7 +173,7 @@ def box_share(a,b):
     c = 0
     a_num = a_id
     while True:
-        belt_num[a_num] = b
+        belt_num[a_num] = b-1
         a_num = nxt[a_num]
         c += 1
         if c == num:
@@ -189,7 +189,7 @@ def box_share(a,b):
     # b 선물 x
     if head[b-1]==0:
         # b 정보 변경
-        head[b-1] = head[a-1]
+        head[b-1] = a_id
         tail[b-1] = new_b_id
         prv[new_ah_id] = 0
         nxt[new_b_id] = 0
