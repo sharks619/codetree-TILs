@@ -24,12 +24,18 @@ waiting_q_cnt += 1
 for _ in range(q-1):
     cmd, *args = list(map(str, input().split()))
     cmd = int(cmd)
+    # print()
     # print("cmd, *args:", cmd, *args)
     # print('작업전')
     # print("waiting_q:", waiting_q)
+    # print("waiting_q_cnt:", waiting_q_cnt)
+    # print("waiting_u_set:", waiting_u_set)
+    # print()
+    # print("judging_d_set:", judging_d_set)
     # print("judging_dic:", judging_dic)
+    # print()
     # print("history_d_dic:", history_d_dic)
-
+    # print()
     if cmd == 200:
         t, p, url = int(args[0]), int(args[1]), args[2]
 
@@ -51,17 +57,10 @@ for _ in range(q-1):
         waiting_q_cnt -= 1
         c_domain, c_id = cu.split('/')
 
-        if c_domain in judging_d_set:
+        if c_domain in judging_d_set or (c_domain in history_d_dic and t < history_d_dic[c_domain][0] + 3 * (history_d_dic[c_domain][1] - history_d_dic[c_domain][0])):
             heapq.heappush(waiting_q, (cp, ct, cu))
             waiting_q_cnt += 1
             continue
-
-        if c_domain in history_d_dic.keys():
-            s, e = history_d_dic[c_domain]
-            if t < s + 3*(e-s):
-                heapq.heappush(waiting_q, (cp, ct, cu))
-                waiting_q_cnt += 1
-                continue
 
         jid = heapq.heappop(waiting_j_q)
         judging_dic[jid] = (t, cu)
@@ -89,5 +88,11 @@ for _ in range(q-1):
 
     # print('작업후')
     # print("waiting_q:", waiting_q)
+    # print("waiting_q_cnt:", waiting_q_cnt)
+    # print("waiting_u_set:", waiting_u_set)
+    # print()
+    # print("judging_d_set:", judging_d_set)
     # print("judging_dic:", judging_dic)
+    # print()
     # print("history_d_dic:", history_d_dic)
+    # print()
