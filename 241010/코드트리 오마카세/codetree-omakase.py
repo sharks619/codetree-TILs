@@ -33,7 +33,7 @@ for _ in range(q):
     queries.append(Query(cmd, t, x, name, n))
 
     if cmd == 100:
-        p_queries[name] = [Query(cmd, t, x, name, n)]
+        p_queries[name].append(Query(cmd, t, x, name, n))
 
     elif cmd == 200:
         names.add(name)
