@@ -1,78 +1,74 @@
+import heapq
 from collections import defaultdict
 
-class Query:
-    def __init__(self, cmd, t, x, name, n):
-        self.cmd = cmd
-        self.t = t
-        self.x = x
-        self.name = name
-        self.n = n
 
-queries = [] # 명령들을 관리합니다.
-names = set() # 등장한 사람 목록을 관리합니다.
-p_queries = defaultdict(list) # 각 사람마다 주어진 초밥 명령만을 관리합니다.
-entry_time = {} # 각 사람마다 입장 시간을 관리합니다.
-position = {} # 각 손님의 위치를 관리합니다.
-exit_time = {} # 각 사람마다 퇴장 시간을 관리합니다.
+cmds = [] # 명령
+names = set() # 사람 이름
+food_info = defaultdict(list) # {음식 이름: [시간, 위치]}
+entry_time = {} # {사람 : 입장 시간}
+position = {} # {사람 : 위치}
+exit_time = {} # {사람 : 퇴장 시간}
+
 
 l, q = map(int, input().split())
+
 for _ in range(q):
-    command = input().split()
-    cmd, t, x, n = -1, -1, -1, -1
-    name = ""
-    cmd = int(command[0])
+    cmd, *args = input().split()
+    cmd = int(cmd)
+
     if cmd == 100:
-        t, x, name = command[1:]
+        t, x, name = args
         t, x = map(int, [t, x])
+        food_info[name].append((t, x))
+        heapq.heappush(cmds, (t, cmd))
+
     elif cmd == 200:
-        t, x, name, n = command[1:]
+        t, x, name, n = args
         t, x, n = map(int, [t, x, n])
-    else:
-        t = int(command[1])
-
-    queries.append(Query(cmd, t, x, name, n))
-
-    if cmd == 100:
-        p_queries[name].append(Query(cmd, t, x, name, n))
-
-    elif cmd == 200:
         names.add(name)
         entry_time[name] = t
         position[name] = x
+        heapq.heappush(cmds, (t, cmd))
+
+    else:
+        t = int(args[0])
+        heapq.heappush(cmds, (t, cmd))
+
 
 for name in names:
     exit_time[name] = 0
 
-    for q in p_queries[name]:
+    for ft, fx in food_info[name]: # time, position
         # 초밥 먼저 등장
         time_to_removed = 0
-        if q.t < entry_time[name]:
-            t_sushi_x = (q.x + (entry_time[name] - q.t)) % l
+        if ft < entry_time[name]:
+            t_sushi_x = (fx + (entry_time[name] - ft)) % l
             a_time = (position[name] - t_sushi_x + l) % l
 
             time_to_removed = entry_time[name] + a_time
         # 사람 먼저 등장
         else:
-            a_time = (position[name] - q.x + l) % l
-            time_to_removed = q.t + a_time
+            a_time = (position[name] - fx + l) % l
+            time_to_removed = ft + a_time
 
         if exit_time[name] < time_to_removed:
             exit_time[name] = time_to_removed
 
-        queries.append(Query(111, time_to_removed, -1, name, -1))
-    queries.append(Query(222, exit_time[name], -1, name, -1))
+        heapq.heappush(cmds,(time_to_removed, 111))
 
-queries.sort(key=lambda x: (x.t, x.cmd))
+for name in names:
+    heapq.heappush(cmds,(exit_time[name], 222))
 
 p_num, s_num = 0, 0
-for i in range(len(queries)):
-    if queries[i].cmd == 100:
+while cmds:
+    _, cmd = heapq.heappop(cmds)
+    if cmd == 100:
         s_num += 1
-    elif queries[i].cmd == 111:
+    elif cmd == 111:
         s_num -= 1
-    elif queries[i].cmd == 200:
+    elif cmd == 200:
         p_num += 1
-    elif queries[i].cmd == 222:
+    elif cmd == 222:
         p_num -= 1
     else:
         print(p_num, s_num)
