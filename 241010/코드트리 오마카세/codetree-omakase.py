@@ -1,63 +1,66 @@
-info = list(input().split())
-L = int(info[0])
-Q = int(info[1])
+import bisect
 
-client = {}  # {'june': (7, 4, 2), ..., 'name': (t,x,n)}
-sushi_num = 0
-people_num = 0
+L, Q = [int(x) for x in input().split()]
+cmds = []
 
-### 입력받아 cmd_list에 저장
-cmd_list = []
-for _ in range(Q):
-    command = list(input().split())
-    cmd_list.append(command)
+class Sushi:
+    def __init__(self, t, x, name):
+        self.t = t
+        self.x = x
+        self.name = name
 
-    if command[0] =='200':
-        name = command[3]
-        t = int(command[1])
-        x1 = int(command[2])
-        n = int(command[4])
-        client[name] = [t, x1, n]
+sushies_info = dict()
+sushies_n = 0
+customers_n = 0
+eat = []
+go = []
 
-
-### 소멸 쿼리 cmd_list_plus에 생성
-cmd_list_plus=[]
-for cmd in cmd_list:
-    if cmd[0] == '100':  # 스시 추가 & 소멸 쿼리 생성
-        t = int(cmd[1])
-        x0 = int(cmd[2])
-        name = cmd[3]
-
-        x1 = client[name][1]
-        t1 = client[name][0]
-        if x0 <= x1:  # 손님이 앞에 있음
-            t_del = x1-x0+t
-        else:    # 손님이 원 인덱스 넘어감
-            t_del = L-x0+x1+t
-        if t1 > t_del:  # 소멸 예정시간에 손님이 없는 경우
-            t_del += ((t1 - t_del + L-1) // L) * L
-        cmd_list_plus.append(['111', str(t_del), name])
-
-### 쿼리 합친 후 정렬
-cmd_list += cmd_list_plus
-cmd_list = sorted(cmd_list, key=lambda x: (int(x[1]), x[0]))
+for q in range(Q):
+    line = [x for x in input().split()]
+    cmds.append(line)
+    if int(line[0]) == 100:
+        t, x, name = [int(line[1]), int(line[2]), line[3]]
+        sushi = Sushi(t, x, name)
+        if name in sushies_info:
+            sushies_info[name].append(sushi)
+        else:
+            sushies_info[name] = [sushi]
 
 
-### 카운팅 수행
-for cmd in cmd_list:
-    if cmd[0] == '100':  # 스시 추가 & 소멸 쿼리 생성
-        sushi_num += 1
+for q in range(Q):
+    line = cmds[q]
+    cmd = int(line[0])
 
-    elif cmd[0] == '111':  # 스시 삭제
-        sushi_num -= 1
+    if cmd == 100:
+        sushies_n += 1
 
-        name = cmd[2] # 클라이언트 삭제
-        client[name][2] -= 1  # n--
-        if client[name][2] == 0:
-            people_num -= 1
+    elif cmd == 200:
+        t, x, name, n = [int(line[1]), int(line[2]), line[3], int(line[4])]
+        customers_n += 1
+        max_time = -1
 
-    elif cmd[0] == '200':  # 클라이언트 추가
-        people_num += 1
+        for sushi in sushies_info[name]:
+            if sushi.t <= t:
+                time = t + (sushi.t - t + x - sushi.x) % L
+            else:
+                time = sushi.t + (x - sushi.x) % L
+            eat.append(time)
+            if max_time < time:
+                max_time = time
 
-    elif cmd[0] == '300':  # 사진 촬영
-        print(people_num, sushi_num)
+        eat.sort()
+        go.append(max_time)
+        go.sort()
+
+    elif cmd == 300:
+        t = int(line[1])
+
+        idx = bisect.bisect_right(eat, t)
+        # print("aaa:", sushies_n, idx)
+        sushies_left = sushies_n - idx
+
+        idx = bisect.bisect_right(go, t)
+        customers_n = len(go) - idx
+
+        print(customers_n, sushies_left)
+    # print(sushies_n, customers_n, go, eat)
