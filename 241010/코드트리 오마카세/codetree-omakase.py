@@ -1,66 +1,80 @@
-import bisect
+from collections import defaultdict
 
-L, Q = [int(x) for x in input().split()]
-cmds = []
-
-class Sushi:
-    def __init__(self, t, x, name):
+class Query:
+    def __init__(self, cmd, t, x, name, n):
+        self.cmd = cmd
         self.t = t
         self.x = x
         self.name = name
+        self.n = n
 
-sushies_info = dict()
-sushies_n = 0
-customers_n = 0
-eat = []
-go = []
+queries = [] # 명령들을 관리합니다.
+names = set() # 등장한 사람 목록을 관리합니다.
+p_queries = defaultdict(list) # 각 사람마다 주어진 초밥 명령만을 관리합니다.
+entry_time = {} # 각 사람마다 입장 시간을 관리합니다.
+position = {} # 각 손님의 위치를 관리합니다.
+exit_time = {} # 각 사람마다 퇴장 시간을 관리합니다.
 
-for q in range(Q):
-    line = [x for x in input().split()]
-    cmds.append(line)
-    if int(line[0]) == 100:
-        t, x, name = [int(line[1]), int(line[2]), line[3]]
-        sushi = Sushi(t, x, name)
-        if name in sushies_info:
-            sushies_info[name].append(sushi)
-        else:
-            sushies_info[name] = [sushi]
+l, q = map(int, input().split())
+for _ in range(q):
+    command = input().split()
+    cmd, t, x, n = -1, -1, -1, -1
+    name = ""
+    cmd = int(command[0])
+    if cmd == 100:
+        t, x, name = command[1:]
+        t, x = map(int, [t, x])
+    elif cmd == 200:
+        t, x, name, n = command[1:]
+        t, x, n = map(int, [t, x, n])
+    else:
+        t = int(command[1])
 
-
-for q in range(Q):
-    line = cmds[q]
-    cmd = int(line[0])
+    queries.append(Query(cmd, t, x, name, n))
 
     if cmd == 100:
-        sushies_n += 1
+        p_queries[name].append(Query(cmd, t, x, name, n))
 
     elif cmd == 200:
-        t, x, name, n = [int(line[1]), int(line[2]), line[3], int(line[4])]
-        customers_n += 1
-        max_time = -1
+        names.add(name)
+        entry_time[name] = t
+        position[name] = x
 
-        for sushi in sushies_info[name]:
-            if sushi.t <= t:
-                time = t + (sushi.t - t + x - sushi.x) % L
-            else:
-                time = sushi.t + (x - sushi.x) % L
-            eat.append(time)
-            if max_time < time:
-                max_time = time
+for name in names:
+    exit_time[name] = 0
 
-        eat.sort()
-        go.append(max_time)
-        go.sort()
+    for q in p_queries[name]:
+        # 초밥 먼저 등장
+        time_to_removed = 0
+        if q.t < entry_time[name]:
+            t_sushi_x = (q.x + (entry_time[name] - q.t)) % l
+            a_time = (position[name] - t_sushi_x + l) % l
 
-    elif cmd == 300:
-        t = int(line[1])
+            time_to_removed = entry_time[name] + a_time
+        # 사람 먼저 등장
+        else:
+            a_time = (position[name] - q.x + l) % l
+            time_to_removed = q.t + a_time
 
-        idx = bisect.bisect_right(eat, t)
-        # print("aaa:", sushies_n, idx)
-        sushies_left = sushies_n - idx
+        if exit_time[name] < time_to_removed:
+            exit_time[name] = time_to_removed
 
-        idx = bisect.bisect_right(go, t)
-        customers_n = len(go) - idx
+        queries.append(Query(111, time_to_removed, -1, name, -1))
 
-        print(customers_n, sushies_left)
-    # print(sushies_n, customers_n, go, eat)
+for name in names:
+    queries.append(Query(222, exit_time[name], -1, name, -1))
+
+queries.sort(key=lambda x: (x.t, x.cmd))
+
+p_num, s_num = 0, 0
+for i in range(len(queries)):
+    if queries[i].cmd == 100:
+        s_num += 1
+    elif queries[i].cmd == 111:
+        s_num -= 1
+    elif queries[i].cmd == 200:
+        p_num += 1
+    elif queries[i].cmd == 222:
+        p_num -= 1
+    else:
+        print(p_num, s_num)
