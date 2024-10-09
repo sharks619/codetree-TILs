@@ -60,8 +60,6 @@ for name in names:
             exit_time[name] = time_to_removed
 
         queries.append(Query(111, time_to_removed, -1, name, -1))
-
-for name in names:
     queries.append(Query(222, exit_time[name], -1, name, -1))
 
 queries.sort(key=lambda x: (x.t, x.cmd))
