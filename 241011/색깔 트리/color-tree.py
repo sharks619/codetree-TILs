@@ -13,20 +13,35 @@ def color_change(id, c):
         color_info[child] = c
         color_change(child, c)
 
-def check(id, score):
-    c_colors = set([color_info[id]])
-    for child in children[id]:
-        child_colors, score = check(child, score)
-        c_colors |= child_colors
-    score += len(c_colors)**2
-    return c_colors, score
+def check(id):
+    stack = [(id, False)]  # (노드 ID, 방문 완료 여부)
+    color_sets = defaultdict(set)  # 각 노드의 색상 집합
+    score = 0
+
+    while stack:
+        node, visited = stack.pop()
+
+        if visited:
+            # 자식들을 모두 방문한 후, 해당 노드의 점수 계산
+            color_sets[node].add(color_info[node])
+            score += len(color_sets[node]) ** 2
+            # 부모 노드에 색상 집합 합치기
+            if parent[node] != 0:
+                color_sets[parent[node]] |= color_sets[node]
+        else:
+            # 노드를 다시 스택에 넣고 자식들을 스택에 추가
+            stack.append((node, True))
+            for child in children[node]:
+                stack.append((child, False))
+
+    return score
 
 def check_score():
     total_score = 0
     for r in root:
-        _, score = check(r,0)
-        total_score += score
+        total_score += check(r)
     print(total_score)
+
 
 q = int(input())
 
