@@ -1,6 +1,6 @@
 from collections import deque
 
-dirs = [(-1,0),(0,-1),(1,0),(0,1)] # 북:0, 동:1, 남:2, 서:3
+dirs = [(-1,0),(0,1),(1,0),(0,-1)] # 북:0, 동:1, 남:2, 서:3
 
 r,c,k = map(int, input().split())
 maps = [[0]*c for _ in range(r+3)]
@@ -26,16 +26,16 @@ def g_move(ci,di,i):
 
         # 서 + 남
         elif (1<=cr<r+1 and 2<=cc<c-1 and
-              maps[cr-1][cc-1]+ maps[cr][cc-2]+ maps[cr+1][cc-2] + maps[cr+2][cc-1] == 0):
+              maps[cr-1][cc-1] + maps[cr][cc-2] + maps[cr+1][cc-2] + maps[cr+2][cc-1] == 0):
             nr,nc = cr+1,cc-1
-            cd = (cd+1)%4
+            cd = (cd+3)%4
             q.append((nr,nc,cd))
 
         # 동 + 남
         elif (1<=cr<r+1 and 1<=cc<c-2 and
-              maps[cr-1][cc+1]+ maps[cr][cc+2]+ maps[cr+1][cc+2] + maps[cr+2][cc+1] == 0):
+              maps[cr-1][cc+1] + maps[cr][cc+2] + maps[cr+1][cc+2] + maps[cr+2][cc+1] == 0):
             nr,nc = cr+1,cc+1
-            cd = (cd+3)%4
+            cd = (cd+1)%4
             q.append((nr,nc,cd))
 
     if max_r < 4:
@@ -43,6 +43,7 @@ def g_move(ci,di,i):
 
     er,ec = max_r + dirs[max_d][0], max_c + dirs[max_d][1]
     exit_set.add((er,ec))
+
     maps[max_r][max_c+1] = i+1
     maps[max_r+1][max_c] = i+1
     maps[max_r][max_c-1] = i+1
