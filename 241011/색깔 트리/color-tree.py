@@ -5,47 +5,46 @@ children = defaultdict(list)
 color_info = defaultdict(int)
 depth_info = defaultdict(int)
 root = []
-color_sets = defaultdict(set)  # 각 노드의 서브트리 색상 집합 캐싱
 
 def color_change(id, c):
     color_info[id] = c
-    color_sets.clear()  # 색상 변경 시 캐시 초기화
 
-    # 자식들의 색상도 변경
-    stack = [id]
-    while stack:
-        node = stack.pop()
-        color_info[node] = c
-        for child in children[node]:
-            stack.append(child)
+    for child in children[id]:
+        color_info[child] = c
+        color_change(child, c)
 
-def calculate_subtree_colors(node_id):
-    stack = [node_id]
-    visited = set()
+def check(id):
+    stack = [(id, False)]  # (노드 ID, 방문 완료 여부)
+    color_sets = defaultdict(set)  # 각 노드의 색상 집합
+    score = 0
 
     while stack:
-        node = stack[-1]
-        if node in visited:
-            stack.pop()
+        node, visited = stack.pop()
+
+        if visited:
+            # 자식들을 모두 방문한 후, 해당 노드의 점수 계산
             color_sets[node].add(color_info[node])
-            for child in children[node]:
-                color_sets[node] |= color_sets[child]
+            score += len(color_sets[node]) ** 2
+            # 부모 노드에 색상 집합 합치기
+            if parent[node] != -1:
+                color_sets[parent[node]] |= color_sets[node]
         else:
-            visited.add(node)
+            # 노드를 다시 스택에 넣고 자식들을 스택에 추가
+            stack.append((node, True))
             for child in children[node]:
-                stack.append(child)
+                stack.append((child, False))
+
+    return score
 
 def check_score():
-    # 모든 루트의 서브트리 색상 계산
     total_score = 0
     for r in root:
-        calculate_subtree_colors(r)
-        for node in color_sets:
-            total_score += len(color_sets[node]) ** 2
+        total_score += check(r)
     print(total_score)
 
-# 입력 처리 및 명령 수행
+
 q = int(input())
+
 for _ in range(q):
     cmd, *args = list(map(int, input().split()))
 
@@ -53,15 +52,18 @@ for _ in range(q):
         m_id, p_id, color, max_depth = args
         if p_id == -1:
             root.append(m_id)
-        else:
+
+        if p_id != -1:
             parent_depth = depth_info[p_id]
+
             if parent_depth <= 1:
                 continue
+
             if max_depth > parent_depth - 1:
                 max_depth = parent_depth - 1
-            parent[m_id] = p_id
-            children[p_id].append(m_id)
 
+        parent[m_id] = p_id
+        children[p_id].append(m_id)
         color_info[m_id] = color
         depth_info[m_id] = max_depth
 
